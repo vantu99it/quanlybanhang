@@ -62,7 +62,9 @@
                     <div class="account-btn">
                         <a href="./import-manage.php?brand=2" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 2){echo "btn-active";}?>">Cơ sở 2</a>
                     </div>
-
+                    <div class="account-btn full-screen">
+                        <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
+                    </div>
                 </section>
             <?php } ?>
             <div class="main-right-table">
@@ -78,7 +80,7 @@
                             <th>Người nhập</th>
                             <th>Ngày nhập</th>
                             <th class = "full-screen">Ghi chú</th>
-                            <th>Hành động</th>
+                            <th class = "noExcel">Hành động</th>
                         </tr>
                         
                     </thead>
@@ -132,5 +134,15 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
+
+    <script>
+        function tableToExcel(){
+            $("#table-manage").table2excel({
+                exclude: ".noExcel",
+                filename: "nhapkho.xls", 
+                preserveColors: false
+            });
+        }
+    </script>
 </body>
 </html>

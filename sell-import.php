@@ -65,8 +65,12 @@
             $price = $resultsPro -> price;
 
             // Tổng tiền
-            $total = $price * $quantity - $sale + $plus;
-
+            if($id_payment_status == 5){
+                $total = 0;
+            }else{
+                $total = $price * $quantity - $sale + $plus;
+            }
+            
             // Kiểm tra sự tồn tại trong bảng số lượng
             $queryAmount= $conn -> prepare("SELECT * FROM tbl_amount WHERE id_product = :id_product and id_brand = :id_brand");
             $queryAmount->bindParam(':id_product',$id_product,PDO::PARAM_STR);

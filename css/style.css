@@ -405,6 +405,8 @@ body {
   display: flex;
   border-bottom: 1px solid #ccc;
   margin-bottom: 15px;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 .main-right-filter .btn {
   height: 30px;

@@ -8,13 +8,14 @@
         $id_power = $_SESSION['logins']['power'];
         $id_brand = $_SESSION['logins']['id_brand'];
         if(isset($_GET['brand'])){
+            // Theo cơ sở
             $id_brand = $_GET['brand'];
-            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.remaining, am.output FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 2 AND wa.id_brand = :id_brand");
+            $queryWare= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE wa.id_brand = :id_brand");
             $queryWare->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
             $queryWare-> execute();
             $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
         }else{
-            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.remaining, am.output FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 2");
+            $queryWare= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where ");
             $queryWare-> execute();
             $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
         }
@@ -45,10 +46,10 @@
         <div id="main-right">
             <section class="main-right-title" style = "margin-bottom: 5px;">
                 <div class="form-title">
-                    <h1>Quản lý xuất kho</h1>
+                    <h1>Quản lý đơn hàng</h1>
                 </div>
                 <div class="account-btn">
-                    <a href="./output-warehouse.php" class="btn btn-post btn-add">Xuất kho</a>
+                    <a href="./output-warehouse.php" class="btn btn-post btn-add">Nhập đơn</a>
                 </div>
             </section>
             <?php if($id_power != 3){ ?>
@@ -66,19 +67,33 @@
                         <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
                     </div>
                 </section>
+                <!-- nút lọc -->
+                <section class="main-right-filter">
+                    <div class="account-btn">
+                        <a href="./output-manage.php" class="btn btn-post btn-add <?php if(!isset($_GET['brand'])){echo "btn-active";}?>" >Theo người bán</a>
+                    </div>
+                    <div class="account-btn">
+                        <a href="./output-manage.php?brand=1" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 1){echo "btn-active";}?>">Theo người nhập</a>
+                    </div>
+                    <div class="account-btn">
+                        <a href="./output-manage.php?brand=2" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 2){echo "btn-active";}?>">Cơ sở 2</a>
+                    </div>
+                </section>
             <?php } ?>
             <div class="main-right-table">
                 <table class="table table-bordered table-post-list" id = "table-manage">
                     <thead>
                         <tr>
                             <th class = "full-screen" >STT</th>
+                            <th class = "full-screen">Ngày bán</th>
                             <th>Sản phẩm</th>
-                            <th>SL Xuất</th>
-                            <th class = "full-screen">Tổng</th>
-                            <th class = "full-screen">Kệ còn</th>
-                            <th class = "full-screen">Cơ sở</th>
-                            <th>Người nhập</th>
-                            <th>Ngày nhập</th>
+                            <th>Số lượng</th>
+                            <th class = "full-screen">Giảm</th>
+                            <th class = "full-screen">Cộng</th>
+                            <th class = "full-screen">Tình trạng</th>
+                            <th>Tổng</th>
+                            <th>Nguồn</th>
+                            <th class = "full-screen">Người bán</th>
                             <th class = "full-screen">Ghi chú</th>
                             <th>Hành động</th>
                         </tr>
@@ -89,29 +104,53 @@
                             <tr>
                                 <td class = "full-screen"><?php echo $key+1 ?></td>
                                 <td>
+                                    <p>
+                                        <?php 
+                                            echo date_format(date_create( $value -> date),"d-m-Y")
+                                        ?>
+                                    </p>
+                                </td>
+                                <td>
                                     <p><?php echo $value -> product?></p>
                                 </td>
                                 <td>
                                     <p><?php echo $value -> quantity ?></p>
                                 </td>
-                                <td class = "full-screen">
-                                    <p><?php echo $value -> output ?></p>
-                                </td>
-                                <td class = "full-screen">
-                                    <p><?php echo $value -> remaining ?></p>
-                                </td>
-                                <td class = "full-screen">
-                                    <p><?php echo $value -> brand ?></p>
-                                </td>
                                 <td>
-                                    <p><?php echo $value -> user ?></p>
+                                    <p>
+                                        <?php 
+                                            $tien = (int) $value -> sale;
+                                            $bien = number_format($tien,0,",",".");
+                                            echo $bien."đ";
+                                        ?>
+                                     </p>
                                 </td>
                                 <td>
                                     <p>
                                         <?php 
-                                            echo date_format(date_create( $value -> created_ad),"d-m-Y")
+                                            $tien = (int) $value -> plus;
+                                            $bien = number_format($tien,0,",",".");
+                                            echo $bien."đ";
                                         ?>
-                                    </p>
+                                     </p>
+                                </td>
+                                <td class = "full-screen">
+                                    <p><?php echo $value -> payment ?></p>
+                                </td>
+                                <td>
+                                    <p>
+                                        <?php 
+                                            $tien = (int) $value -> total;
+                                            $bien = number_format($tien,0,",",".");
+                                            echo $bien."đ";
+                                        ?>
+                                     </p>
+                                </td>
+                                <td>
+                                    <p><?php echo $value -> from_where ?></p>
+                                </td>
+                                <td>
+                                     <p><?php echo $value -> fullname ?></p>
                                 </td>
                                 <td class = "full-screen">
                                     <p><?php echo $value -> note ?></p>

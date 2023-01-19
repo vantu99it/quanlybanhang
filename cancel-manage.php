@@ -62,6 +62,9 @@
                     <div class="account-btn">
                         <a href="./cancel-manage.php?brand=2" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 2){echo "btn-active";}?>">Cơ sở 2</a>
                     </div>
+                    <div class="account-btn full-screen">
+                        <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
+                    </div>
                 </section>
             <?php } ?>
             <div class="main-right-table">
@@ -131,5 +134,15 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
+
+    <script>
+        function tableToExcel(){
+            $("#table-manage").table2excel({
+                exclude: ".noExcel",
+                filename: "huyke.xls", 
+                preserveColors: false
+            });
+        }
+    </script>
 </body>
 </html>

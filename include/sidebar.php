@@ -22,7 +22,11 @@
             </a>
             <ul class="sidebar-menu-mini">
                 <li class="menu-item-mini"><a href="./sell-import.php">Nhập đơn</a></li>
-                <li class="menu-item-mini"><a href="./sell-manage.php">Đơn đã nhập</a></li>
+                <?php if($id_power != 3){ ?>
+                    <li class="menu-item-mini"><a href="./sell-manage.php">Cơ sở 1</a></li>
+                <?php } else { ?>
+                    <li class="menu-item-mini"><a href="./sell-manage.php?brand=2">Cơ sở 1</a></li>
+                <?php } ?>
             </ul>
         </li>
         <li class="menu-item">

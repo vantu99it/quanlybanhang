@@ -142,7 +142,7 @@
                         <p class="form-message"></p>
                     </div>
                     <div class="form-input form-validator">
-                        <p class="item-name">Số lượng xuất ra <span class="col-red">*</span></p>
+                        <p class="item-name">Số lượng hủy <span class="col-red">*</span></p>
                         <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="" placeholder = "" onchange="checkQuantity()">
                         <p class="form-message" id ="quantity-message"></p>
                     </div>
