@@ -22,10 +22,14 @@
             </a>
             <ul class="sidebar-menu-mini">
                 <li class="menu-item-mini"><a href="./sell-import.php">Nhập đơn</a></li>
-                <?php if($id_power != 3){ ?>
-                    <li class="menu-item-mini"><a href="./sell-manage.php">Cơ sở 1</a></li>
+                <?php if($id_power == 3 && $id_brand == 1  ){ ?>
+                    <li class="menu-item-mini"><a href="./sell-manage.php?brand=1">Cơ sở 1</a></li>
+                <?php } elseif($id_power == 3 && $id_brand == 2  ){ ?>
+                    <li class="menu-item-mini"><a href="./sell-manage.php?brand=2">Cơ sở 2</a></li>
                 <?php } else { ?>
-                    <li class="menu-item-mini"><a href="./sell-manage.php?brand=2">Cơ sở 1</a></li>
+                    <li class="menu-item-mini"><a href="./sell-manage.php?brand=1">Cơ sở 1</a></li>
+                    <li class="menu-item-mini"><a href="./sell-manage.php?brand=2">Cơ sở 2</a></li>
+                    <li class="menu-item-mini"><a href="./sell-COD.php">Đơn COD</a></li>
                 <?php } ?>
             </ul>
         </li>
@@ -88,19 +92,34 @@
                 <li class="menu-item-mini"><a href="./manage-product.php">Quản lý sản phẩm</a></li>
             </ul>
         </li>
-        <?php if($id_power != 3){ ?>
-            <li class="menu-item">
-                <a href="javascrip:void(0)">
-                    <iconify-icon class="icon" icon="mdi:user-card-details-outline" width="24" height="24"></iconify-icon>
-                    Quản lý tài khoản
-                    <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
-                </a>
-                <ul class="sidebar-menu-mini">
+        <li class="menu-item">
+            <a href="javascrip:void(0)">
+               <iconify-icon class="icon" icon="material-symbols:playlist-add-check-circle-rounded" width="24" height="24"></iconify-icon>
+                Chấm công
+                <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
+            </a>
+            <ul class="sidebar-menu-mini">
+                <li class="menu-item-mini"><a href="./timekeeping.php">Chấm công</a></li>
+                <li class="menu-item-mini"><a href="./timekeeping-brand-1.php">Bảng chấm công CS1</a></li>
+                <li class="menu-item-mini"><a href="./timekeeping-brand-2.php">Bảng chấm công CS2</a></li>
+            </ul>
+        </li>
+        
+        <li class="menu-item">
+            <a href="javascrip:void(0)">
+                <iconify-icon class="icon" icon="mdi:user-card-details-outline" width="24" height="24"></iconify-icon>
+                Quản lý tài khoản
+                <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
+            </a>
+            <ul class="sidebar-menu-mini">
+                <?php if($id_power != 3){ ?>
                     <li class="menu-item-mini"><a href="./new-user.php">Thêm người dùng</a></li>
                     <li class="menu-item-mini"><a href="./manage-user.php">Quản lý người dùng</a></li>
-                </ul>
-            </li>
-        <?php }?>
+                <?php }?>
+                <li class="menu-item-mini"><a href="./profile.php">Tài khoản cá nhân</a></li>
+            </ul>
+        </li>
+
         <?php if($id_power != 3){ ?>
             <li class="menu-item">
                 <a href="javascrip:void(0)">

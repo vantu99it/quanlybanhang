@@ -128,7 +128,7 @@ body {
 .body-login {
   background: linear-gradient(45deg, #ff216d, #2196f3);
   position: relative;
-  height: 625px;
+  min-height: 694px;
   color: #fff;
   text-align: center;
 }
@@ -407,12 +407,20 @@ body {
   margin-bottom: 15px;
   flex-direction: row;
   flex-wrap: wrap;
+  align-items: center;
 }
 .main-right-filter .btn {
   height: 30px;
   font-size: 14px;
   font-weight: 400;
   margin: 5px;
+}
+.main-right-filter form {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
 }
 #main-right .table-bordered th,
 .table-bordered td {
@@ -481,4 +489,64 @@ body {
 }
 .search-item span.select2 {
   width: 50% !important;
+}
+/* form-act */
+.form-act {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background-color: rgba(33, 33, 45, 0.3);
+  z-index: 999;
+  display: none;
+}
+.form-act-edit {
+  margin-top: 35px;
+  padding: 20px;
+  max-width: 810px;
+  width: 80%;
+  background-color: rgba(255, 255, 255, 1);
+  position: relative;
+  left: 50%;
+  transform: translate(-50%);
+}
+.form-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  padding: 12px;
+}
+.form-close i {
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+}
+.form-half {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.form-half .form-contact {
+  width: 48%;
+}
+.form-contact {
+  margin-top: 10px;
+}
+.form-contact .contact-title {
+  font-size: 16px;
+  text-transform: uppercase;
+  margin: 10px 0;
+}
+.form-contact input {
+  font-size: 16px;
+  width: 100%;
+  height: 40px;
+  border-radius: 5px;
+  padding: 0 10px;
+  border: 1px solid #ccc;
+  outline-color: #41ff00;
+  margin: 4px 0 5px;
 }

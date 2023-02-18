@@ -73,3 +73,14 @@ function ImageFileAsUrlUpdate() {
     }
   }
 }
+// form-act
+$(document).ready(function () {
+  // Nhấn nút thêm mới
+  $(".btn-add").click(function () {
+    $(".form-act").fadeIn(500);
+  });
+  // Nhấn dấu x tắt form
+  $(".form-close").click(function () {
+    $(".form-act").fadeOut(500);
+  });
+});

@@ -12,6 +12,19 @@
         $id_brand = $_SESSION['logins']['id_brand'];
 
         $id_act = 1;
+        $id_sell = $_GET['id'];
+
+        //gọi ra thông tin đơn hàng
+         $querySell= $conn -> prepare("SELECT sell.*, br.name AS brandName, us.fullname, pro.name AS product, pay.name AS payment, frm.name AS fromWhere
+        FROM tbl_sell_manage sell JOIN tbl_brand br ON br.id = sell.id_brand
+        JOIN tbl_user us ON us.id = sell.id_user_sell
+        JOIN tbl_product pro ON pro.id = sell.id_product
+        JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status
+        JOIN tbl_from_where frm ON frm.id = sell.id_from_where
+        WHERE sell.id = :id");
+        $querySell->bindParam(':id',$id_sell,PDO::PARAM_STR);
+        $querySell-> execute();
+        $resultsSell = $querySell->fetch(PDO::FETCH_OBJ);
 
         //nhân viên
         $queryUser= $conn -> prepare("SELECT * FROM tbl_user WHERE status = 1");
@@ -43,6 +56,8 @@
         $queryFrom= $conn -> prepare("SELECT * FROM tbl_from_where WHERE status = 1");
         $queryFrom-> execute();
         $resultsFrom = $queryFrom->fetchAll(PDO::FETCH_OBJ);
+
+
 
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             $id_brand = $_POST["brand"];
@@ -164,6 +179,7 @@
                     <div class="search-item form-validator">
                         <p class="item-name">Cơ sở <span class="col-red">*</span></p>
                         <select  class="autobox form-focus boder-ra-5" name ="brand" id="brand">
+                            <option value="<?php echo $resultsSell -> id_brand ?>"><?php echo $resultsSell -> brandName ?></option>
                             <?php if($id_power != 3){ ?>
                                 <?php foreach ($resultsBrand as $key => $value) { ?>
                                     <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
@@ -178,6 +194,7 @@
                     <div class="search-item form-validator">
                         <p class="item-name">Người bán <span class="col-red">*</span></p>
                         <select  class="autobox form-focus boder-ra-5" name ="user" id="user">
+                            <option value="<?php echo $resultsSell -> id_user_sell ?>"><?php echo $resultsSell -> fullname ?></option>
                             <?php foreach ($resultsUser as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"<?php echo(($value -> id) == $id_user)?"selected":"" ?>><?php echo $value -> fullname ?></option>
                             <?php } ?>
@@ -187,14 +204,14 @@
 
                     <div class="form-input form-validator">
                         <p class="item-name">Ngày <span class="col-red">*</span></p>
-                        <input type="date" name="date" id="date" class=" form-focus boder-ra-5" value ="<?php echo $get_today ?>" >
+                        <input type="date" name="date" id="date" class=" form-focus boder-ra-5" value ="<?php echo $resultsSell -> date ?>" >
                         <p class="form-message"></p>
                     </div>
 
                     <div class="search-item form-validator">
                         <p class="item-name">Chọn sản phẩm <span class="col-red">*</span></p>
                         <select  class="autobox form-focus boder-ra-5" name ="product" id="product" onChange="selectProd()">
-                            <option value="">Chọn sản phẩm</option>
+                            <option value="<?php echo $resultsSell -> id_product ?>"><?php echo $resultsSell -> product ?></option>
                             <?php foreach ($resultsProd as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
                             <?php } ?>
@@ -209,26 +226,26 @@
 
                     <div class="form-input form-validator">
                         <p class="item-name">Số lượng bán <span class="col-red">*</span></p>
-                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="" placeholder = "" onchange = "checkQuantity()">
+                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="<?php echo $resultsSell -> quantity ?>" placeholder = "" onchange = "checkQuantity()">
                         <p class="form-message" id ="quantity-message"></p>
                     </div>
 
                     <div class="form-input form-validator">
                         <p class="item-name">Giảm giá/trừ</p>
-                        <input type="number" class="form-focus boder-ra-5" name = "sale" id="sale" value="0" placeholder = "">
+                        <input type="number" class="form-focus boder-ra-5" name = "sale" id="sale" value="<?php echo $resultsSell -> sale ?>" placeholder = "">
                         <p class="form-message"></p>
                     </div>
 
                     <div class="form-input form-validator">
                         <p class="item-name">Cộng thêm</p>
-                        <input type="number" class="form-focus boder-ra-5" name = "plus" id="plus" value="0" placeholder = "">
+                        <input type="number" class="form-focus boder-ra-5" name = "plus" id="plus" value="<?php echo $resultsSell -> plus ?>" placeholder = "">
                         <p class="form-message"></p>
                     </div>
 
                     <div class="search-item form-validator">
                         <p class="item-name">Chọn hình thức thanh toán <span class="col-red">*</span></p>
                         <select  class="autobox form-focus boder-ra-5" name ="payment" id="payment" onchange="totalPayment()">
-                            <option value="">Chọn loại thanh toán</option>
+                            <option value="<?php echo $resultsSell -> id_payment_status ?>"><?php echo $resultsSell -> payment ?></option>
                             <?php foreach ($resultsPay as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
                             <?php } ?>
@@ -243,8 +260,8 @@
 
                     <div class="search-item form-validator">
                         <p class="item-name">Đơn từ đâu <span class="col-red">*</span></p>
-                        <select  class="autobox form-focus boder-ra-5" name ="from" id="from">
-                            <option value="">Đơn từ đâu</option>
+                        <select  class="autobox form-focus boder-ra-5" name ="from" id="from" onChange="selectProd()">
+                             <option value="<?php echo $resultsSell -> id_from_where ?>"><?php echo $resultsSell -> fromWhere ?></option>
                             <?php foreach ($resultsFrom as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
                             <?php } ?>
@@ -254,7 +271,7 @@
 
                     <div class="form-input form-validator">
                         <p class="item-name">Ghi chú </p>
-                        <textarea name="note" id="note" cols="10" rows="5" class="form-focus boder-ra-5 textarea"></textarea>
+                        <textarea name="note" id="note" cols="10" rows="5" class="form-focus boder-ra-5 textarea"><?php echo $resultsSell -> note ?></textarea>
                         <p class="form-message"></p>
                     </div>
 
@@ -295,7 +312,7 @@
             var product = $("#product").val();
             var quantity= $("#quantity").val();
             jQuery.ajax({
-            url: "./include/get-quantity-sell.php?brand="+ brand + "&product="+ product+ "&quantity=" + quantity,
+            url: "./include/get-quantity-cancel.php?brand="+ brand + "&product="+ product+ "&quantity=" + quantity,
             success: function(data) {
                 $("#quantity-message").html(data);
             },

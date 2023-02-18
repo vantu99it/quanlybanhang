@@ -31,40 +31,6 @@
             $quantity = $_POST["quantity"];
             $note = $_POST["note"];
 
-            //Kiểm tra sự tồn ại trong bảng số lượng
-            $queryAmount= $conn -> prepare("SELECT * FROM tbl_amount WHERE id_product = :id_product and id_brand = :id_brand");
-            $queryAmount->bindParam(':id_product',$id_product,PDO::PARAM_STR);
-            $queryAmount->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-            $queryAmount-> execute();
-            $resultsAmount = $queryAmount->fetch(PDO::FETCH_OBJ);
-            if($queryAmount->rowCount() > 0){
-                // Gọi ra thông tin cũ
-                $total_input = $resultsAmount->total_input; //Tổng nhập vào
-                $input = $resultsAmount->input; // Nhập kho
-                $output = $resultsAmount->output; // xuất kho
-                $cancel = $resultsAmount->cancel; //Hủy kho
-                $sold = $resultsAmount->sold; // đã bán
-                $remaining = $resultsAmount->remaining; // còn lại kệ
-
-                // Tạo thông tin mới
-                $total_inputNew = $total_input + $quantity;
-                $inputNew = $input + $quantity;
-
-                $queryAmount= $conn -> prepare("UPDATE tbl_amount SET total_input = :total_input, input = :input WHERE id_product = :id_product AND id_brand = :id_brand ");
-                $queryAmount->bindParam(':total_input',$total_inputNew,PDO::PARAM_STR);
-                $queryAmount->bindParam(':input',$inputNew,PDO::PARAM_STR);
-                $queryAmount->bindParam(':id_product',$id_product,PDO::PARAM_STR);
-                $queryAmount->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-                $queryAmount-> execute();
-            }else{
-                $queryAmount= $conn -> prepare("INSERT INTO tbl_amount (id_product, total_input, input, id_brand) value (:id_product, :total_input, :input, :id_brand)");
-                $queryAmount->bindParam(':id_product',$id_product,PDO::PARAM_STR);
-                $queryAmount->bindParam(':total_input',$quantity,PDO::PARAM_STR);
-                $queryAmount->bindParam(':input',$quantity,PDO::PARAM_STR);
-                $queryAmount->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-                $queryAmount-> execute();
-            }
-
             $queryWare= $conn -> prepare("INSERT INTO tbl_warehouse (id_product, quantity, id_user, id_brand, id_act, note ) value (:id_product, :quantity, :id_user, :id_brand, :id_act, :note)");
             $queryWare->bindParam(':id_product',$id_product,PDO::PARAM_STR);
             $queryWare->bindParam(':quantity',$quantity,PDO::PARAM_STR);
@@ -136,7 +102,7 @@
                     </div>
                     <div class="search-item form-validator">
                         <p class="item-name">Chọn sản phẩm <span class="col-red">*</span></p>
-                        <select  class="autobox form-focus boder-ra-5" name ="product" id="product" onChange="selectProd()">
+                        <select  class="autobox form-focus boder-ra-5" name ="product" id="product" onchange="selectProd()">
                             <option value="">Chọn sản phẩm</option>
                             <?php foreach ($resultsProd as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
@@ -150,7 +116,11 @@
                     </div>
                     <div class="form-input form-validator">
                         <p class="item-name">Số lượng nhập vào <span class="col-red">*</span></p>
-                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="" placeholder = "">
+                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="" placeholder = "" onchange="checkQuantity()">
+                        <p class="form-message"></p>
+                    </div>
+                    <div class="form-input form-validator" id = "quantity-message">
+                        <!-- code js đẩy vào -->
                         <p class="form-message"></p>
                     </div>
                     <div class="form-input form-validator">
@@ -191,6 +161,35 @@
                 error: function() {}
             });
         };
+    </script>
+    <!-- Hiển thị số lượng đang có trong kho -->
+    <script>
+        function checkQuantity(){
+            var brand = $("#brand").val();
+            var product = $("#product").val();
+            var quantity= $("#quantity").val();
+            jQuery.ajax({
+            url: "./include/get-quantity-import.php?brand="+ brand + "&product="+ product+ "&quantity=" + quantity,
+            success: function(data) {
+                $("#quantity-message").html(data);
+            },
+            error: function() {}
+            });
+        };
+    </script>
+    <!-- Bắt lỗi nhập vào -->
+    <script>
+        Validator({
+            form: '#frm-post',
+            formGroupSelector: '.form-validator',
+            errorSelector: ".form-message",
+            rules: [
+                Validator.isRequired('#brand', 'Vui lòng chọn cơ sở'), 
+                Validator.isRequired('#product', 'Vui lòng chọn sản phẩm'),
+                Validator.isRequired('#quantity', 'Vui lòng nhập số lượng'),
+                Validator.numberMin('#quantity',0 ,'Số lượng phải lớn hơn 0'),
+            ],
+        });
     </script>
 </body>
 </html>

@@ -23,23 +23,8 @@ require_once("./connect.php");
     $output= (int)$resultsOutput->total;
 
     $checkTotal = $input - $output;
-    $check = $checkTotal - $quantity;
+        echo 'Số lượng kho đang có: <b>'.$checkTotal.'</b>';       
 
-    if($output > 0){
-        if($check < 0){
-            echo 'Số lượng kho chỉ còn <b>'.$checkTotal.'</b> => không thể xuất';
-            echo "<script>$('#submits').prop('disabled',true);</script>";
-        }elseif($check == 0){
-            echo '<b>Lưu ý:</b> Nếu xuất '.$quantity.' kho sẽ hết!';
-            echo "<script>$('#submits').prop('disabled',false);</script>";
-        }else{
-            echo 'Số lượng kho đang có:  <b>'.$checkTotal.'</b>';
-            echo "<script>$('#submits').prop('disabled',false);</script>";
-        }
-    }else{
-        echo 'Sản phẩm chưa được nhập vào kho!';
-        echo "<script>$('#submits').prop('disabled',true);</script>";
-    }
  }
 
 

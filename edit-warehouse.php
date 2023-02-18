@@ -8,7 +8,7 @@
         $id_power = $_SESSION['logins']['power'];
         $id_brand = $_SESSION['logins']['id_brand'];
 
-        $id_act = 2;
+        $id_act = 1;
 
         //sản phẩm
         $queryProd= $conn -> prepare("SELECT * FROM tbl_product WHERE status = 1");
@@ -31,14 +31,6 @@
             $quantity = $_POST["quantity"];
             $note = $_POST["note"];
 
-            //Kiểm tra sự tồn ại trong bảng số lượng
-            $queryAmount= $conn -> prepare("SELECT * FROM tbl_amount WHERE id_product = :id_product and id_brand = :id_brand");
-            $queryAmount->bindParam(':id_product',$id_product,PDO::PARAM_STR);
-            $queryAmount->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-            $queryAmount-> execute();
-            $resultsAmount = $queryAmount->fetch(PDO::FETCH_OBJ);
-            
-
             $queryWare= $conn -> prepare("INSERT INTO tbl_warehouse (id_product, quantity, id_user, id_brand, id_act, note ) value (:id_product, :quantity, :id_user, :id_brand, :id_act, :note)");
             $queryWare->bindParam(':id_product',$id_product,PDO::PARAM_STR);
             $queryWare->bindParam(':quantity',$quantity,PDO::PARAM_STR);
@@ -49,7 +41,7 @@
             $queryWare-> execute();
             $lastInsertId = $conn->lastInsertId();
             if($lastInsertId){
-                $msg = "Đã xuất kho thành công!";
+                $msg = "Đã nhập kho thành công!";
             }else{
                 $error = "Thất bại! Vui lòng thử lại!";
             }
@@ -62,7 +54,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Xuất kho</title>
+    <title>Admin | Bảng điều khiển</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
@@ -81,7 +73,7 @@
         <div id="main-right">
             <section class="main-right-title">
                 <div class="form-title">
-                    <h1>Xuất hàng ra kệ</h1>
+                    <h1>Nhập hàng vào kho</h1>
                 </div>
             </section>
             <form action="" method="post" id = "frm-post">
@@ -123,17 +115,17 @@
                         <p class="form-message"></p>
                     </div>
                     <div class="form-input form-validator">
-                        <p class="item-name">Số lượng xuất ra <span class="col-red">*</span></p>
-                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="" placeholder = "" onchange="checkQuantity()">
-                        <p class="form-message" id ="quantity-message"></p>
+                        <p class="item-name">Số lượng nhập vào <span class="col-red">*</span></p>
+                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="" placeholder = "">
+                        <p class="form-message"></p>
                     </div>
                     <div class="form-input form-validator">
-                        <p class="item-name">Ghi chú</p>
+                        <p class="item-name">Ghi chú </p>
                         <textarea name="note" id="note" cols="10" rows="5" class="form-focus boder-ra-5 textarea"></textarea>
                         <p class="form-message"></p>
                     </div>
                     <div class="submit-form">
-                        <input type="submit" name="submit-form" class="btn btn-submit" value="Xuất kho" id = "submits" style = "width: 100%;height: 45px;font-size: 18px;">
+                        <input type="submit" name="submit-form" class="btn btn-submit"  value="Nhập kho" style = "width: 100%;height: 45px;font-size: 18px;">
                     </div>
                 </div>
             </form>
@@ -143,22 +135,6 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
-
-    <!-- Bắt lỗi nhập vào -->
-    <script>
-        Validator({
-            form: '#frm-post',
-            formGroupSelector: '.form-validator',
-            errorSelector: ".form-message",
-            rules: [
-                Validator.isRequired('#brand', 'Vui lòng chọn cơ sở'), 
-                Validator.isRequired('#product', 'Vui lòng chọn sản phẩm'),
-                Validator.isRequired('#quantity', 'Vui lòng nhập số lượng'),
-                // Validator.isRequired('#note', 'Vui lòng ghi chú lí do'),
-            ],
-        });
-    </script>
-    <!-- select -->
     <script>
         $(document).ready(function() { 
             $("#product").select2({
@@ -167,7 +143,6 @@
              }); 
         });
     </script>
-    <!-- load chi tiết sản phẩm -->
     <script>
         function selectProd(){
             jQuery.ajax({
@@ -183,20 +158,19 @@
             });
         };
     </script>
-    <!-- kiểm tra số lượng xuất ra-->
+    <!-- Bắt lỗi nhập vào -->
     <script>
-        function checkQuantity(){
-            var brand = $("#brand").val();
-            var product = $("#product").val();
-            var quantity= $("#quantity").val();
-            jQuery.ajax({
-            url: "./include/get-quantity-output.php?brand="+ brand + "&product="+ product+ "&quantity=" + quantity,
-            success: function(data) {
-                $("#quantity-message").html(data);
-            },
-            error: function() {}
-            });
-        };
+        Validator({
+            form: '#frm-post',
+            formGroupSelector: '.form-validator',
+            errorSelector: ".form-message",
+            rules: [
+                Validator.isRequired('#brand', 'Vui lòng chọn cơ sở'), 
+                Validator.isRequired('#product', 'Vui lòng chọn sản phẩm'),
+                Validator.isRequired('#quantity', 'Vui lòng nhập số lượng'),
+                Validator.numberMin('#quantity',1 ,'Số lượng phải lớn hơn 1'),
+            ],
+        });
     </script>
 </body>
 </html>

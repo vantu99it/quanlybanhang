@@ -9,7 +9,7 @@
         $id_power = $_SESSION['logins']['power'];
         $id_brand = $_SESSION['logins']['id_brand'];
 
-        $queryPro= $conn -> prepare("SELECT pr.*, clas.name AS classify, us.username, uni.name AS unit FROM tbl_product pr JOIN tbl_classify clas ON clas.id = pr.id_classify JOIN tbl_user us on us.id = pr.id_user JOIN tbl_unit uni ON uni.id = pr.id_unit WHERE pr.status = 1");
+        $queryPro= $conn -> prepare("SELECT pr.*, clas.name AS classify, us.username, uni.name AS unit FROM tbl_product pr JOIN tbl_classify clas ON clas.id = pr.id_classify JOIN tbl_user us on us.id = pr.id_user JOIN tbl_unit uni ON uni.id = pr.id_unit ");
         $queryPro-> execute();
         $resultsPro = $queryPro->fetchAll(PDO::FETCH_OBJ);
     }
@@ -96,10 +96,7 @@
                                 </td>
                                 <td style = "text-align: center;">
                                     <?php if($id_power != 3){ ?>
-                                        <a href="./edit-user.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
-
-                                        <a href="./categories.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
-                                        </a>
+                                        <a href="./edit-product.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
                                     <?php } ?>
 
                                     <?php if( $value -> status == 1){ ?>

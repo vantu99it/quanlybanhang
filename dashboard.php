@@ -1,8 +1,6 @@
 <?php 
     include './include/connect.php';
     include './include/func-slug.php';
-
-   
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,7 +25,7 @@
         
         <!-- main-right -->
         <div id="main-right">
-            
+            <?php echo $id_power ;?>
         </div>
         <!-- /main-right -->
     </div>

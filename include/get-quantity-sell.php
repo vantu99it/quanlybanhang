@@ -43,7 +43,7 @@ if(!empty($_GET["brand"]) && !empty($_GET["product"]) && !empty($_GET["quantity"
             echo "<script>$('#submits').prop('disabled',false);</script>";
         }
     }else{
-        echo 'Sản phẩm ở kệ không có => không thể hủy!';
+        echo 'Sản phẩm ở kệ không có => không thể bán!';
         echo "<script>$('#submits').prop('disabled',true);</script>";
     }
 }

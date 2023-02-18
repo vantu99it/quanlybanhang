@@ -9,12 +9,12 @@
         $id_brand = $_SESSION['logins']['id_brand'];
         if(isset($_GET['brand'])){
             $id_brand = $_GET['brand'];
-            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.total_input AS total, am.input FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 1 AND wa.id_brand = :id_brand");
+            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.total_input AS total, am.input FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 1 AND wa.id_brand = :id_brand ORDER BY wa.created_ad DESC");
             $queryWare->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
             $queryWare-> execute();
             $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
         }else{
-            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.total_input AS total, am.input FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 1");
+            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.total_input AS total, am.input FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 1 ORDER BY wa.created_ad DESC");
             $queryWare-> execute();
             $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
         }
@@ -117,7 +117,7 @@
                                     <p><?php echo $value -> note ?></p>
                                 </td>
                                 <td style = "text-align: center;">
-                                    <a href="./edit-user.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
+                                    <a href="./edit-warehouse.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
                                     <?php if($id_power != 3){ ?>
                                         <a href="./categories.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
                                     <?php } ?>

@@ -9,12 +9,12 @@
         $id_brand = $_SESSION['logins']['id_brand'];
         if(isset($_GET['brand'])){
             $id_brand = $_GET['brand'];
-            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.remaining, am.cancel FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 3 AND wa.id_brand = :id_brand");
+            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.remaining, am.cancel FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 3 AND wa.id_brand = :id_brand ORDER BY wa.created_ad DESC");
             $queryWare->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
             $queryWare-> execute();
             $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
         }else{
-            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.remaining, am.cancel FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 3");
+            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand, am.remaining, am.cancel FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand JOIN tbl_amount am ON am.id_product = pro.id WHERE wa.id_act = 3 ORDER BY wa.created_ad DESC");
             $queryWare-> execute();
             $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
         }
@@ -77,8 +77,8 @@
                             <th class = "full-screen">Tổng</th>
                             <th class = "full-screen">Kệ còn</th>
                             <th class = "full-screen">Cơ sở</th>
-                            <th>Người nhập</th>
-                            <th>Ngày nhập</th>
+                            <th>Người hủy</th>
+                            <th>Ngày hủy</th>
                             <th class = "full-screen">Ghi chú</th>
                             <th>Hành động</th>
                         </tr>

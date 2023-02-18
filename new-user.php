@@ -120,6 +120,7 @@
                             <option value="1">Tài khoản quản trị</option>
                             <option value="2">Tài khoản quản lý</option>
                             <option value="3">Tài khoản nhân viên</option>
+                            <option value="4">Tài khoản cộng tác viên</option>
                         </select>
                         <p class="form-message"></p>
                     </div>

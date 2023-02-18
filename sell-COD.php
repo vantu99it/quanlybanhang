@@ -7,32 +7,22 @@
         $id_user = $_SESSION['logins']['id'];
         $id_power = $_SESSION['logins']['power'];
         $id_brand = $_SESSION['logins']['id_brand'];
-        $today = date('Y-m-d');
-        if($_SERVER["REQUEST_METHOD"] == "POST"){
-            $fromDate = $_POST["from-date"];
-            $toDate = $_POST["to-date"];
+        if(isset($_GET['brand'])){
+            $id_brand = $_GET['brand'];
 
-            $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date >= :fromDate AND sell.date <= :toDate");
-            $querySell->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
-            $querySell->bindParam('fromDate',$fromDate,PDO::PARAM_STR);
-            $querySell->bindParam('toDate',$toDate,PDO::PARAM_STR);
-            $querySell-> execute();
-            $resultsSell = $querySell->fetchAll(PDO::FETCH_OBJ);
-
+            $queryCOD= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE pay.type = 'COD' AND sell.id_brand = :id_brand ");
+            $queryCOD->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
+            $queryCOD-> execute();
+            $resultsCOD = $queryCOD->fetchAll(PDO::FETCH_OBJ);
         }else{
-            if(isset($_GET['brand']) && !isset($_GET['day']) || isset($_GET['brand']) && isset($_GET['day']) && $_GET['day'] == "today" ){
-                $id_brand =$_GET['brand'];
-                $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date = :today");
-                $querySell->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
-                $querySell->bindParam('today',$today,PDO::PARAM_STR);
-                $querySell-> execute();
-                $resultsSell = $querySell->fetchAll(PDO::FETCH_OBJ);
-            }
+            $queryCOD= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE pay.type = 'COD'");
+            $queryCOD-> execute();
+            $resultsCOD = $queryCOD->fetchAll(PDO::FETCH_OBJ);
         }
-       $sum=0;
-        foreach ($resultsSell as $key => $value) {
-            $sum += (int) $value->total;
-        } 
+    }
+    $sum=0;
+    foreach ($resultsCOD as $key => $value) {
+        $sum += (int) $value->total;
     }
 ?>
 <!DOCTYPE html>
@@ -67,21 +57,18 @@
                 </div>
             </section>
             <section class="main-right-filter">
-                <form action="" method="post">
-                    <span>Từ</span>
-                    <input type="date" name="from-date" id="from-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($fromDate)? $fromDate : "" ?>">
-                    <span>Đến</span>
-                    <input type="date" name="to-date" id="to-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($toDate)? $toDate : ""  ?>">
-                    <input type="submit" value="Lọc" class="btn btn-post btn-add">
-                </form>
                 <div class="account-btn">
-                    <a href="./sell-manage.php?brand=<?php echo $id_brand?>&day=today" class="btn btn-post btn-add <?php if(!isset($_GET['brand'])&&!isset($_GET['today'])&&$_GET['today']= $today){echo "btn-active";}?>" >Hôm nay</a>
+                    <a href="./sell-COD.php" class="btn btn-post btn-add <?php if(!isset($_GET['brand'])){echo "btn-active";}?>" >Tất cả</a>
                 </div>
-                <?php if($id_power != 3){ ?>
-                    <div class="account-btn full-screen">
-                        <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
-                    </div>
-                <?php } ?>
+                <div class="account-btn">
+                    <a href="./sell-COD.php?brand=1" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 1){echo "btn-active";}?>">Cơ sở 1</a>
+                </div>
+                <div class="account-btn">
+                    <a href="./sell-COD.php?brand=2" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 2){echo "btn-active";}?>">Cơ sở 2</a>
+                </div>
+                <div class="account-btn full-screen">
+                    <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
+                </div>
             </section>
             <section class="main-right-filter">
                 <p>Tổng tiền: <b class="col-red">
@@ -111,7 +98,7 @@
                         
                     </thead>
                     <tbody >
-                        <?php foreach ( $resultsSell as $key => $value) { ?>
+                        <?php foreach ( $resultsCOD as $key => $value) { ?>
                             <tr>
                                 <td class = "full-screen"><?php echo $key+1 ?></td>
                                 <td>
@@ -167,7 +154,7 @@
                                     <p><?php echo $value -> note ?></p>
                                 </td>
                                 <td style = "text-align: center;">
-                                    <a href="./sell-edit.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
+                                    <a href="./edit-user.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
 
                                    <?php if($id_power != 3){ ?>
                                         <a href="./categories.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
