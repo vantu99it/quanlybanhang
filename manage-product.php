@@ -43,7 +43,7 @@
                 </div>
                  <?php if($id_power != 3){ ?>
                     <div class="account-btn">
-                        <a href="./new-user.php" class="btn btn-post btn-add">Tạo mới</a>
+                        <a href="./new-product.php" class="btn btn-post btn-add">Tạo mới</a>
                     </div>
                 <?php } ?>
             </section>

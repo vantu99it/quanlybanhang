@@ -75,10 +75,10 @@
         <div id="main-right">
             <section class="main-right-title" style = "margin-bottom: 5px;">
                 <div class="form-title">
-                    <h1>Quản lý đơn hàng</h1>
+                    <h1>Bảng chấm công CS2</h1>
                 </div>
                 <div class="account-btn">
-                    <a href="./sell-import.php" class="btn btn-post btn-add">Nhập đơn</a>
+                    <a href="./timekeeping.php" class="btn btn-post btn-add">Chấm công</a>
                 </div>
             </section>
             <section class="main-right-filter">
@@ -197,7 +197,7 @@
                                     <p><?php echo $value -> note ?></p>
                                 </td>
                                 <td style = "text-align: center;">
-                                    <a href="./edit-user.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
+                                    <a href="./timekeeping-edit.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
 
                                    <?php if($id_power != 3){ ?>
                                         <a href="./categories.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>

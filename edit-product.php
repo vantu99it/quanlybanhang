@@ -4,6 +4,10 @@
     if (!isset($_SESSION['logins'])) {
         header('location:index.php');
     }else{
+        $err = "";
+        $ok = "";
+        $message = "";
+
         $id_user = $_SESSION['logins']['id'];
 
         //gọi ra loại sản phẩm
@@ -49,9 +53,12 @@
                 $queryProd->bindParam(':id',$id_pro,PDO::PARAM_STR);
                 $queryProd-> execute();
                 if($queryProd){
-                    $msg = "Cập nhật thông tin sản phẩm thành công!";
-                }else{
-                    $error = "Thất bại! Vui lòng thử lại!";
+                    $ok = 1;
+                    $message = "Đã cập nhật thành công!";
+                }
+                else{
+                    $err = 1;
+                    $message = "Có lỗi xảy ra, vui lòng thử lại";
                 }
             }
         }
@@ -161,6 +168,47 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
+
+    <!-- Thông báo thành công -->
+    <?php if($ok == 1){ ?>
+    <div class="noti">
+        <div class="success-checkmark">
+            <div class="check-icon">
+                <span class="icon-line line-tip"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./manage-product.php" class="btn">OK</a>
+        </div>
+    </div>
+    <?php }?>
+    <!-- Thông báo thất bại -->
+    <?php if($err == 1){ ?>
+    <div class="noti">
+        <div class="error-banmark">
+            <div class="ban-icon">
+                <span class="icon-line line-long-invert"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./edit-product.php?id=<?php echo $id_pro ?>" class="btn">OK</a>        
+        </div>
+    </div>
+    <?php }?>
+
+
     <script>
         Validator({
             form: '#frm-post',

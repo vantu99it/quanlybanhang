@@ -15,7 +15,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Bảng điều khiển</title>
+    <title>Admin | Quản lý tài khoản</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
@@ -37,7 +37,7 @@
                     <h1>Quản lý tài khoản</h1>
                 </div>
                 <div class="account-btn">
-                    <button class="btn btn-post btn-add">Tạo mới</button>
+                    <a href="./new-user.php" class="btn btn-post btn-add">Tạo mới</a>
                 </div>
             </section>
             <div class="main-right-table">

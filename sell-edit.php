@@ -85,35 +85,8 @@
             }else{
                 $total = $price * $quantity - $sale + $plus;
             }
-            
-            // Kiểm tra sự tồn tại trong bảng số lượng
-            $queryAmount= $conn -> prepare("SELECT * FROM tbl_amount WHERE id_product = :id_product and id_brand = :id_brand");
-            $queryAmount->bindParam(':id_product',$id_product,PDO::PARAM_STR);
-            $queryAmount->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-            $queryAmount-> execute();
-            $resultsAmount = $queryAmount->fetch(PDO::FETCH_OBJ);
-            if($queryAmount->rowCount() > 0){
-                // Gọi ra thông tin cũ
-                $total_input = $resultsAmount->total_input; //Tổng nhập vào
-                $input = $resultsAmount->input; // Nhập kho
-                $output = $resultsAmount->output; // xuất kho
-                $cancel = $resultsAmount->cancel; //Hủy kho
-                $sold = $resultsAmount->sold; // đã bán
-                $remaining = $resultsAmount->remaining; // còn lại kệ
 
-                // Tạo thông tin mới
-                $soldNew = $sold + $quantity;
-                $remainingNew = $output - $cancel - $soldNew ;
-
-                $queryAmount= $conn -> prepare("UPDATE tbl_amount SET sold = :sold, remaining = :remaining, update_at = now() WHERE id_product = :id_product AND id_brand = :id_brand");
-                $queryAmount->bindParam(':sold',$soldNew,PDO::PARAM_STR);
-                $queryAmount->bindParam(':remaining',$remainingNew,PDO::PARAM_STR);
-                $queryAmount->bindParam(':id_product',$id_product,PDO::PARAM_STR);
-                $queryAmount->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-                $queryAmount-> execute();
-            }
-
-            $queryWare= $conn -> prepare("INSERT INTO tbl_sell_manage (id_brand, id_user_sell, date, id_product, quantity, sale, plus, total, id_payment_status , id_from_where, id_user, note ) value (:id_brand, :id_user_sell, :date, :id_product, :quantity, :sale, :plus, :total, :id_payment_status , :id_from_where, :id_user, :note)");
+            $queryWare= $conn -> prepare("UPDATE tbl_sell_manage SET id_brand = :id_brand, id_user_sell = :id_user_sell, date = :date, id_product = :id_product, quantity = :quantity, sale = :sale, plus = :plus, total = :total, id_payment_status = :id_payment_status , id_from_where = :id_from_where, id_user = :id_user, note = :note WHERE id = :id ");
             $queryWare->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $queryWare->bindParam(':id_user_sell',$id_user_sell,PDO::PARAM_STR);
             $queryWare->bindParam(':date',$date,PDO::PARAM_STR);
@@ -126,10 +99,10 @@
             $queryWare->bindParam(':id_from_where',$id_from_where,PDO::PARAM_STR);
             $queryWare->bindParam(':id_user',$id_user,PDO::PARAM_STR);
             $queryWare->bindParam(':note',$note,PDO::PARAM_STR);
+            $queryWare->bindParam(':id',$id_sell,PDO::PARAM_STR);
             $queryWare-> execute();
-            $lastInsertId = $conn->lastInsertId();
-            if($lastInsertId){
-                $msg = "Đơn đã được lưu!";
+            if($queryWare){
+                $msg = "Đơn đã được cập nhật chỉnh sửa!";
             }else{
                 $error = "Thất bại! Vui lòng thử lại!";
             }

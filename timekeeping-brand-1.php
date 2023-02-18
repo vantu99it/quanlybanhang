@@ -4,6 +4,10 @@
     if (!isset($_SESSION['logins'])) {
         header('location:index.php');
     }else{
+        $err = "";
+        $ok = "";
+        $message = "";
+        
         $id_user = $_SESSION['logins']['id'];
         $id_power = $_SESSION['logins']['power'];
         $id_brand = 2;
@@ -48,6 +52,23 @@
             $resultsTime = $queryTime->fetchAll(PDO::FETCH_OBJ);
 
         }
+
+        // Xóa 
+        if(isset($_REQUEST['del'])&&($_REQUEST['del'])){
+            $delId = intval($_GET['del']);
+
+            $query= $conn -> prepare("DELETE FROM tbl_timekeeping WHERE id = :id");
+            $query->bindParam(':id',$delId,PDO::PARAM_STR);
+            $query->execute();
+            if($query){
+                $ok = 1;
+                $message = "Đã xóa thành công";
+            }
+            else{
+                $err = 1;
+                $message = "Có lỗi xảy ra, vui lòng thử lại";
+            }
+        }
     }
 ?>
 <!DOCTYPE html>
@@ -56,7 +77,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin |Chấm công cơ sở 2</title>
+    <title>Admin |Chấm công cơ sở 1</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
@@ -75,10 +96,10 @@
         <div id="main-right">
             <section class="main-right-title" style = "margin-bottom: 5px;">
                 <div class="form-title">
-                    <h1>Quản lý đơn hàng</h1>
+                    <h1>Bảng chấm công CS1</h1>
                 </div>
                 <div class="account-btn">
-                    <a href="./sell-import.php" class="btn btn-post btn-add">Nhập đơn</a>
+                    <a href="./timekeeping.php" class="btn btn-post btn-add">Chấm công</a>
                 </div>
             </section>
             <section class="main-right-filter">
@@ -197,10 +218,10 @@
                                     <p><?php echo $value -> note ?></p>
                                 </td>
                                 <td style = "text-align: center;">
-                                    <a href="./edit-user.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
+                                    <a href="./timekeeping-edit.php?id=<?php echo $value -> id ?>&brand=<?php echo $value -> id_brand ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
 
                                    <?php if($id_power != 3){ ?>
-                                        <a href="./categories.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
+                                        <a href="./timekeeping-brand-1.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa? Lưu ý: Xóa chấm công sẽ xóa hết chấm công của ngày! Cân nhắc kỹ!');" ><i class="fa-solid fa-trash"></i>
                                     <?php } ?>
                                 </td>
                             </tr>
@@ -214,6 +235,45 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
+
+    <!-- Thông báo thành công -->
+    <?php if($ok == 1){ ?>
+    <div class="noti">
+        <div class="success-checkmark">
+            <div class="check-icon">
+                <span class="icon-line line-tip"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./timekeeping-brand-1.php" class="btn">OK</a>
+        </div>
+    </div>
+    <?php }?>
+    <!-- Thông báo thất bại -->
+    <?php if($err == 1){ ?>
+    <div class="noti">
+        <div class="error-banmark">
+            <div class="ban-icon">
+                <span class="icon-line line-long-invert"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./timekeeping-brand-1.php" class="btn">OK</a>        
+        </div>
+    </div>
+    <?php }?>
 
     <script>
         function tableToExcel(){

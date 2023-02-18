@@ -4,12 +4,26 @@
     if (!isset($_SESSION['logins'])) {
             header('location:index.php');
     }else{
+
+        $err = "";
+        $ok = "";
+        $message = "";
+
         $id_user = $_SESSION['logins']['id'];
         $id_power = $_SESSION['logins']['power'];
         $id_brand = $_SESSION['logins']['id_brand'];
 
         $id_act = 1;
+        $id_import = $_GET['id'];
+        $id_brand_import = $_GET['brand'];
 
+
+        // Gọi ra thông tin 
+        $queryImport= $conn -> prepare("SELECT wa.*, pro.name AS product, br.name AS brand FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_brand br ON br.id = wa.id_brand WHERE id_act = :id_act AND wa.id = :id");
+        $queryImport->bindParam(':id',$id_import,PDO::PARAM_STR);
+        $queryImport->bindParam(':id_act',$id_act,PDO::PARAM_STR);
+        $queryImport-> execute();
+        $resultsImport = $queryImport->fetch(PDO::FETCH_OBJ);
         //sản phẩm
         $queryProd= $conn -> prepare("SELECT * FROM tbl_product WHERE status = 1");
         $queryProd-> execute();
@@ -31,19 +45,22 @@
             $quantity = $_POST["quantity"];
             $note = $_POST["note"];
 
-            $queryWare= $conn -> prepare("INSERT INTO tbl_warehouse (id_product, quantity, id_user, id_brand, id_act, note ) value (:id_product, :quantity, :id_user, :id_brand, :id_act, :note)");
+            $queryWare= $conn -> prepare("UPDATE tbl_warehouse SET id_product = :id_product, quantity = :quantity, id_user = :id_user, id_brand = :id_brand, id_act = :id_act, note = :note, update_ad = NOW() WHERE id = :id");
             $queryWare->bindParam(':id_product',$id_product,PDO::PARAM_STR);
             $queryWare->bindParam(':quantity',$quantity,PDO::PARAM_STR);
             $queryWare->bindParam(':id_user',$id_user,PDO::PARAM_STR);
             $queryWare->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $queryWare->bindParam(':id_act',$id_act,PDO::PARAM_STR);
             $queryWare->bindParam(':note',$note,PDO::PARAM_STR);
+            $queryWare->bindParam(':id',$id_import,PDO::PARAM_STR);
             $queryWare-> execute();
-            $lastInsertId = $conn->lastInsertId();
-            if($lastInsertId){
-                $msg = "Đã nhập kho thành công!";
-            }else{
-                $error = "Thất bại! Vui lòng thử lại!";
+            if($queryWare){
+                $ok = 1;
+                $message = "Đã cập nhật thành công!";
+            }
+            else{
+                $err = 1;
+                $message = "Có lỗi xảy ra, vui lòng thử lại";
             }
         }
     }
@@ -54,7 +71,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Bảng điều khiển</title>
+    <title>Admin | Chỉnh sửa nhập kho</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
@@ -78,24 +95,13 @@
             </section>
             <form action="" method="post" id = "frm-post">
                 <div class="input-new">
-                    <?php if(isset($error)){ ?>
-                        <div class="errorWrap">
-                            <strong>Lỗi: </strong><span><?php echo $error; ?> </span>
-                        </div>
-                    <?php }elseif(isset($msg)){ ?>
-                        <div class="succWrap">
-                            <strong>Thành công: </strong><span><?php echo $msg; ?> </span>
-                        </div>
-                    <?php } ?>
                     <!-- input -->
                     <div class="search-item form-validator">
                         <p class="item-name">Cơ sở <span class="col-red">*</span></p>
                         <select  class="autobox form-focus boder-ra-5" name ="brand" id="brand">
-                            <?php if($id_power != 3){ ?>
+                            <option value="<?php echo $resultsImport -> id_brand ?>"><?php echo $resultsImport -> brand ?></option>
                             <?php foreach ($resultsBrand as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
-                            <?php } }else{?>
-                                <option value="<?php echo $resultsBrandId -> id ?>" selected><?php echo $resultsBrandId -> name ?></option>
                             <?php }?>
                         </select>
                         <p class="form-message"></p>
@@ -103,7 +109,7 @@
                     <div class="search-item form-validator">
                         <p class="item-name">Chọn sản phẩm <span class="col-red">*</span></p>
                         <select  class="autobox form-focus boder-ra-5" name ="product" id="product" onChange="selectProd()">
-                            <option value="">Chọn sản phẩm</option>
+                            <option value="<?php echo $resultsImport -> id_product ?>"><?php echo $resultsImport -> product ?></option>
                             <?php foreach ($resultsProd as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
                             <?php } ?>
@@ -116,16 +122,16 @@
                     </div>
                     <div class="form-input form-validator">
                         <p class="item-name">Số lượng nhập vào <span class="col-red">*</span></p>
-                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="" placeholder = "">
+                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="<?php echo $resultsImport -> quantity ?>" placeholder = "">
                         <p class="form-message"></p>
                     </div>
                     <div class="form-input form-validator">
                         <p class="item-name">Ghi chú </p>
-                        <textarea name="note" id="note" cols="10" rows="5" class="form-focus boder-ra-5 textarea"></textarea>
+                        <textarea name="note" id="note" cols="10" rows="5" class="form-focus boder-ra-5 textarea"><?php echo $resultsImport -> note ?></textarea>
                         <p class="form-message"></p>
                     </div>
                     <div class="submit-form">
-                        <input type="submit" name="submit-form" class="btn btn-submit"  value="Nhập kho" style = "width: 100%;height: 45px;font-size: 18px;">
+                        <input type="submit" name="submit-form" class="btn btn-submit"  value="Cập nhật" style = "width: 100%;height: 45px;font-size: 18px;">
                     </div>
                 </div>
             </form>
@@ -135,6 +141,46 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
+
+    <!-- Thông báo thành công -->
+    <?php if($ok == 1){ ?>
+    <div class="noti">
+        <div class="success-checkmark">
+            <div class="check-icon">
+                <span class="icon-line line-tip"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./import-manage.php?brand=<?php echo $id_brand_import ?>" class="btn">OK</a>
+        </div>
+    </div>
+    <?php }?>
+    <!-- Thông báo thất bại -->
+    <?php if($err == 1){ ?>
+    <div class="noti">
+        <div class="error-banmark">
+            <div class="ban-icon">
+                <span class="icon-line line-long-invert"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./edit-import-warehouse.php?id=<?php echo $id_import?>&brand=<?php $id_brand_import?>" class="btn">OK</a>        
+        </div>
+    </div>
+    <?php }?>
+
     <script>
         $(document).ready(function() { 
             $("#product").select2({

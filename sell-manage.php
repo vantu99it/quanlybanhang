@@ -6,8 +6,13 @@
     }else{
         $id_user = $_SESSION['logins']['id'];
         $id_power = $_SESSION['logins']['power'];
-        $id_brand = $_SESSION['logins']['id_brand'];
+        // $id_brand = $_SESSION['logins']['id_brand'];
         $today = date('Y-m-d');
+
+        $err = "";
+        $ok = "";
+        $message = "";
+
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             $fromDate = $_POST["from-date"];
             $toDate = $_POST["to-date"];
@@ -33,6 +38,23 @@
         foreach ($resultsSell as $key => $value) {
             $sum += (int) $value->total;
         } 
+        // Xóa
+        $id_brand =$_GET['brand'];
+        if(isset($_REQUEST['del'])&&($_REQUEST['del'])){
+            $delId = intval($_GET['del']);
+            
+            $query= $conn -> prepare("DELETE FROM tbl_sell_manage WHERE id = :id");
+            $query->bindParam(':id',$delId,PDO::PARAM_STR);
+            $query->execute();
+            if($query){
+                $ok = 1;
+                $message = "Đã xóa thành công";
+            }
+            else{
+                $err = 1;
+                $message = "Có lỗi xảy ra, vui lòng thử lại";
+            }
+        }
     }
 ?>
 <!DOCTYPE html>
@@ -69,9 +91,9 @@
             <section class="main-right-filter">
                 <form action="" method="post">
                     <span>Từ</span>
-                    <input type="date" name="from-date" id="from-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($fromDate)? $fromDate : "" ?>">
+                    <input type="date" name="from-date" id="from-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($fromDate)? $fromDate : $today ?>">
                     <span>Đến</span>
-                    <input type="date" name="to-date" id="to-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($toDate)? $toDate : ""  ?>">
+                    <input type="date" name="to-date" id="to-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($toDate)? $toDate :$today ?>">
                     <input type="submit" value="Lọc" class="btn btn-post btn-add">
                 </form>
                 <div class="account-btn">
@@ -170,7 +192,7 @@
                                     <a href="./sell-edit.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
 
                                    <?php if($id_power != 3){ ?>
-                                        <a href="./categories.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
+                                        <a href="./sell-manage.php?brand=<?php echo $id_brand?>&del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
                                     <?php } ?>
                                 </td>
                             </tr>
@@ -184,7 +206,44 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
-
+    <!-- Thông báo thành công -->
+    <?php if($ok == 1){ ?>
+    <div class="noti">
+        <div class="success-checkmark">
+            <div class="check-icon">
+                <span class="icon-line line-tip"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./sell-manage.php?brand=<?php echo $id_brand ?>" class="btn">OK</a>
+        </div>
+    </div>
+    <?php }?>
+    <!-- Thông báo thất bại -->
+    <?php if($err == 1){ ?>
+    <div class="noti">
+        <div class="error-banmark">
+            <div class="ban-icon">
+                <span class="icon-line line-long-invert"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./sell-manage.php?brand=<?php echo $id_brand ?>" class="btn">OK</a>
+        </div>
+    </div>
+    <?php }?>
     <script>
         function tableToExcel(){
             $("#table-manage").table2excel({

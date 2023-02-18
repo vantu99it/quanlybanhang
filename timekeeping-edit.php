@@ -8,17 +8,31 @@
         $ok = "";
         $message = "";
 
+        $id_time = $_GET['id'];
+        $id_brand_edit = $_GET['brand'];
+
         $get_month = date('Y-m');
         $get_today = date('Y-m-d');
         // var_dump($getdate); die();
         $id_user = $_SESSION['logins']['id'];
-        $id_power = $_SESSION['logins']['power'];
-        $id_brand = $_SESSION['logins']['id_brand'];
+        // $id_power = $_SESSION['logins']['power'];
+        // $id_brand = $_SESSION['logins']['id_brand'];
 
-        //nhân viên
+        //gọi ra thông tin chấm công
+        $queryTime= $conn -> prepare("SELECT keep.*, br.name AS brand FROM tbl_timekeeping keep JOIN tbl_brand br ON br.id = keep.id_brand WHERE keep.id =:id");
+        $queryTime->bindParam(':id',$id_time,PDO::PARAM_STR);
+        $queryTime-> execute();
+        $resultsTime = $queryTime->fetch(PDO::FETCH_OBJ);
+
+        //nhân viên theo id
         $queryUser= $conn -> prepare("SELECT * FROM tbl_user WHERE status = 1 AND id = $id_user");
         $queryUser-> execute();
         $resultsUser = $queryUser->fetch(PDO::FETCH_OBJ);
+
+        //nhân viên
+        $queryUsers= $conn -> prepare("SELECT * FROM tbl_user WHERE status = 1 AND power != 1");
+        $queryUsers-> execute();
+        $resultsUsers = $queryUsers->fetchAll(PDO::FETCH_OBJ);
 
         //cơ sở
         $queryBrand= $conn -> prepare("SELECT * FROM tbl_brand WHERE status = 1");
@@ -34,6 +48,7 @@
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             $id_brand = $_POST["brand"];
             $date = $_POST["date"];
+            $id_user = $_POST["user"];
             $time = $_POST["time"];
             $note = $_POST["note"];
 
@@ -43,61 +58,34 @@
             $queryDate->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $queryDate-> execute();
             $resultsDate = $queryDate->fetch(PDO::FETCH_OBJ);
-            // var_dump($time); die();
-            if($queryDate->rowCount() == 0){
-                if($time == '1'){
-                    $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, morning, id_brand, note) value (:date, :time, :id_brand, :note)");
-                }elseif($time == '2'){
-                    $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, noon, id_brand, note) value (:date, :time, :id_brand, :note)");
-                }elseif($time == '3'){
-                    $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, afternoon, id_brand, note) value (:date, :time, :id_brand, :note)");
-                }else{
-                    $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, evening, id_brand, note) value (:date, :time, :id_brand, :note)");
-                }
-                $queryTimeKeep->bindParam(':date',$date,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':time',$id_user,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':note',$note,PDO::PARAM_STR);
-                $queryTimeKeep-> execute();
-                $lastInsertId = $conn->lastInsertId();
-                if($lastInsertId){
-                    $ok = 1;
-                    $message = "Đã chấm công thành công!";
-                }
-                else{
-                    $err = 1;
-                    $message = "Có lỗi xảy ra, vui lòng thử lại";
-                }
+
+            $noteStory =  $resultsDate->note;
+            $noteNew = $noteStory."/.".$note;
+
+            if($time == '1'){
+                $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET morning = :time, note = :note WHERE id = :id ");
+            }elseif($time == '2'){
+                $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET noon= :time, note = :note WHERE id = :id ");
+            }elseif($time == '3'){
+                $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET afternoon= :time, note = :note WHERE id = :id ");
+            }elseif($time == '4'){
+                $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET evening= :time, note = :note WHERE id = :id ");
+            }else{
+                $error = "Thất bại! Vui lòng thử lại!";
+            }
+            $queryTimeKeep->bindParam(':time',$id_user,PDO::PARAM_STR);
+            $queryTimeKeep->bindParam(':id',$id_time,PDO::PARAM_STR);
+            $queryTimeKeep->bindParam(':note',$noteNew,PDO::PARAM_STR);
+            $queryTimeKeep-> execute();
+           if($queryTimeKeep){
+                $ok = 1;
+                $message = "Đã cập nhật thành công!";
             }
             else{
-                $noteStory =  $resultsDate->note;
-                $noteNew = $noteStory."/.".$note;
-
-                if($time == '1'){
-                    $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET morning = :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
-                }elseif($time == '2'){
-                    $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET noon= :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
-                }elseif($time == '3'){
-                    $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET afternoon= :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
-                }elseif($time == '4'){
-                    $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET evening= :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
-                }else{
-                    $error = "Thất bại! Vui lòng thử lại!";
-                }
-                $queryTimeKeep->bindParam(':date',$date,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':time',$id_user,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':note',$noteNew,PDO::PARAM_STR);
-                $queryTimeKeep-> execute();
-                if($queryTimeKeep){
-                    $ok = 1;
-                    $message = "Đã chấm công thành công!";
-                }
-                else{
-                    $err = 1;
-                    $message = "Có lỗi xảy ra, vui lòng thử lại";
-                }
+                $err = 1;
+                $message = "Có lỗi xảy ra, vui lòng thử lại!";
             }
+            
         }
     }
 ?>
@@ -107,7 +95,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Chấm công</title>
+    <title>Admin | Chỉnh sửa chấm công</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
@@ -126,11 +114,11 @@
         <div id="main-right">
             <section class="main-right-title">
                 <div class="form-title">
-                    <h1>Chấm công</h1>
+                    <h1>Chỉnh sửa chấm công</h1>
                 </div>
             </section>
             <section class="main-right-filter">
-                <p><b class="col-red">Lưu ý: </b> Chấm công theo đúng ca làm. Nên chấm đúng ngày. Chỉ được chấm muộn sau 1 ngày. Sau 1 ngày hệ thống tự động khóa ngày. Nếu chấm sai vui lòng liên hệ quản lý để hỗ trợ sửa.</p>
+                <p><b class="col-red">Lưu ý: </b> Bạn đang thực hiện chỉnh sửa chấm công. Vui lòng kiểm tra kỹ trước khi chỉnh sửa.</p>
             </section>
             <form action="" method="post" id = "frm-post">
                 <div class="input-new">
@@ -142,29 +130,35 @@
                     <div class="search-item form-validator">
                         <p class="item-name">Cơ sở <span class="col-red">*</span></p>
                         <select  class="autobox form-focus boder-ra-5" name ="brand" id="brand">
-
-                                <?php foreach ($resultsBrand as $key => $value) { ?>
-                                    <option value="<?php echo $value -> id ?>" <?php echo ($resultsBrandId -> id == $value -> id)? "selected":"" ?>><?php echo $value -> name ?></option>
- 
-                                <?php } ?>
+                            <option value="<?php echo $resultsTime -> id_brand ?>" ><?php echo $resultsTime -> brand ?></option>
                         </select>
                         <p class="form-message"></p>
                     </div>
 
                     <div class="form-input form-validator">
                         <p class="item-name">Ngày <span class="col-red">*</span></p>
-                        <input type="date" name="date" id="dateTime" class=" form-focus boder-ra-5" value ="<?php echo $get_today ?>" >
+                        <input type="date" name="date" id="dateTime" class=" form-focus boder-ra-5" value ="<?php echo $resultsTime->date ?>"  >
+                        <p class="form-message"></p>
+                    </div>
+                    <div class="search-item form-validator">
+                        <p class="item-name">Người được chấm công<span class="col-red">*</span></p>
+                        <select  class="autobox form-focus boder-ra-5" name ="user" id="user">
+                            <option value="">Chọn người sửa chấm công</option>
+                            <?php foreach ($resultsUsers as $key => $value) {?>
+                                <option value="<?php echo $value -> id ?>" ><?php echo $value -> fullname ?></option>
+                            <?php } ?>
+                        </select>
                         <p class="form-message"></p>
                     </div>
 
                     <div class="search-item form-validator">
                         <p class="item-name">Chọn ca làm <span class="col-red">*</span></p>
-                        <select  class="autobox form-focus boder-ra-5" name ="time" id="time"  onChange="selectTime()">
+                        <select  class="autobox form-focus boder-ra-5" name ="time" id="time" onchange="selectTime()">
                            <option value="">Chọn ca làm</option>
-                           <option value="1">Ca sáng</option>
-                           <option value="2">Ca trưa</option>
-                           <option value="3">Ca chiều</option>
-                           <option value="4">Ca tối</option>
+                            <?php echo ($resultsTime->morning != 0)?'<option value="1">Ca sáng</option>':""?>
+                            <?php echo ($resultsTime->noon != 0)?'<option value="2">Ca trưa</option>':""?>
+                            <?php echo ($resultsTime->afternoon != 0)?'<option value="3">Ca chiều</option>':""?>
+                            <?php echo ($resultsTime->evening != 0)?'<option value="4">Ca tối</option>':""?>
                         </select>
                          <p class="form-message"></p>
                          <p class="form-message" id ="errors-message"></p>
@@ -192,8 +186,7 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
-    
-     <!-- Thông báo thành công -->
+    <!-- Thông báo thành công -->
     <?php if($ok == 1){ ?>
     <div class="noti">
         <div class="success-checkmark">
@@ -208,7 +201,7 @@
                      <?php echo $message ?>
                 </p>
             </div>
-            <a href="./timekeeping.php" class="btn">OK</a>
+            <a href="<?php echo ($id_brand_edit==1)?"./timekeeping-brand-1.php": "./timekeeping-brand-2.php"?>" class="btn">OK</a>
         </div>
     </div>
     <?php }?>
@@ -227,11 +220,12 @@
                      <?php echo $message ?>
                 </p>
             </div>
-            <a href="./timekeeping.php" class="btn">OK</a>        
+            <a href="./timekeeping-edit.php?id=<?php echo $id_time?>&brand=<?php $id_brand_edit?>" class="btn">OK</a>        
         </div>
     </div>
     <?php }?>
 
+    
     <!-- Bắt lỗi nhập vào -->
     <script>
         Validator({
@@ -239,7 +233,8 @@
             formGroupSelector: '.form-validator',
             errorSelector: ".form-message",
             rules: [
-                Validator.isRequired('#time', 'Bạn chưa chọn ca để chấm công'),
+                Validator.isRequired('#time', 'Chưa chọn ca để sửa chấm công'),
+                Validator.isRequired('#user', 'Chưa chọn người để sửa chấm công'),
             ],
         });
     </script>
@@ -247,13 +242,16 @@
     <!-- kiểm tra số lượng xuất ra -->
     <script>
         function selectTime(){
-            var user = <?php echo json_encode($id_user); ?> ;
+            var user = $("#user").val();
             var brand = $("#brand").val();
             var dateTime = $("#dateTime").val();
             var time= $("#time").val();
-            console.log(user);
+            // console.log(user);
+            // console.log(brand);
+            // console.log(dateTime);
+            // console.log(time);
             jQuery.ajax({
-            url: "./include/get-timekeeping.php?brand="+ brand + "&date="+ dateTime+ "&time=" + time + "&user="+ user,
+            url: "./include/get-timekeeping-edit.php?brand="+ brand + "&date="+ dateTime+ "&time=" + time + "&user="+ user,
             success: function(data) {
                 $("#errors-message").html(data);
             },

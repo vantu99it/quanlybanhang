@@ -30,14 +30,7 @@
             $id_product = $_POST["product"];
             $quantity = $_POST["quantity"];
             $note = $_POST["note"];
-
-            //Kiểm tra sự tồn ại trong bảng số lượng
-            $queryAmount= $conn -> prepare("SELECT * FROM tbl_amount WHERE id_product = :id_product and id_brand = :id_brand");
-            $queryAmount->bindParam(':id_product',$id_product,PDO::PARAM_STR);
-            $queryAmount->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-            $queryAmount-> execute();
-            $resultsAmount = $queryAmount->fetch(PDO::FETCH_OBJ);
-            
+           
 
             $queryWare= $conn -> prepare("INSERT INTO tbl_warehouse (id_product, quantity, id_user, id_brand, id_act, note ) value (:id_product, :quantity, :id_user, :id_brand, :id_act, :note)");
             $queryWare->bindParam(':id_product',$id_product,PDO::PARAM_STR);

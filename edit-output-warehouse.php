@@ -4,11 +4,25 @@
     if (!isset($_SESSION['logins'])) {
             header('location:index.php');
     }else{
+        $err = "";
+        $ok = "";
+        $message = "";
+
         $id_user = $_SESSION['logins']['id'];
         $id_power = $_SESSION['logins']['power'];
         $id_brand = $_SESSION['logins']['id_brand'];
 
-        $id_act = 3;
+        $id_act = 2;
+
+        $id_output = $_GET['id'];
+        $id_brand_output = $_GET['brand'];
+
+        // Gọi ra thông tin 
+        $queryOutput= $conn -> prepare("SELECT wa.*, pro.name AS product, br.name AS brand FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_brand br ON br.id = wa.id_brand WHERE id_act = :id_act AND wa.id = :id");
+        $queryOutput->bindParam(':id',$id_output,PDO::PARAM_STR);
+        $queryOutput->bindParam(':id_act',$id_act,PDO::PARAM_STR);
+        $queryOutput-> execute();
+        $resultsOutput = $queryOutput->fetch(PDO::FETCH_OBJ);
 
         //sản phẩm
         $queryProd= $conn -> prepare("SELECT * FROM tbl_product WHERE status = 1");
@@ -30,20 +44,25 @@
             $id_product = $_POST["product"];
             $quantity = $_POST["quantity"];
             $note = $_POST["note"];
+           
 
-            $queryWare= $conn -> prepare("INSERT INTO tbl_warehouse (id_product, quantity, id_user, id_brand, id_act, note ) value (:id_product, :quantity, :id_user, :id_brand, :id_act, :note)");
+            $queryWare= $conn -> prepare("UPDATE tbl_warehouse SET id_product = :id_product, quantity = :quantity, id_user = :id_user, id_brand = :id_brand, id_act = :id_act, note = :note, update_ad = NOW() WHERE id = :id");
             $queryWare->bindParam(':id_product',$id_product,PDO::PARAM_STR);
             $queryWare->bindParam(':quantity',$quantity,PDO::PARAM_STR);
             $queryWare->bindParam(':id_user',$id_user,PDO::PARAM_STR);
             $queryWare->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $queryWare->bindParam(':id_act',$id_act,PDO::PARAM_STR);
             $queryWare->bindParam(':note',$note,PDO::PARAM_STR);
+            $queryWare->bindParam(':id',$id_output,PDO::PARAM_STR);
             $queryWare-> execute();
             $lastInsertId = $conn->lastInsertId();
-            if($lastInsertId){
-                $msg = "Đã hủy kệ thành công!";
-            }else{
-                $error = "Thất bại! Vui lòng thử lại!";
+            if($queryWare){
+                $ok = 1;
+                $message = "Đã cập nhật thành công!";
+            }
+            else{
+                $err = 1;
+                $message = "Có lỗi xảy ra, vui lòng thử lại";
             }
         }
     }
@@ -54,7 +73,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Hủy hàng</title>
+    <title>Admin | Chỉnh sửa xuất kho</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
@@ -73,29 +92,18 @@
         <div id="main-right">
             <section class="main-right-title">
                 <div class="form-title">
-                    <h1>Hủy hàng khỏi kệ</h1>
+                    <h1>Xuất hàng ra kệ</h1>
                 </div>
             </section>
             <form action="" method="post" id = "frm-post">
                 <div class="input-new">
-                    <?php if(isset($error)){ ?>
-                        <div class="errorWrap">
-                            <strong>Lỗi: </strong><span><?php echo $error; ?> </span>
-                        </div>
-                    <?php }elseif(isset($msg)){ ?>
-                        <div class="succWrap">
-                            <strong>Thành công: </strong><span><?php echo $msg; ?> </span>
-                        </div>
-                    <?php } ?>
                     <!-- input -->
                     <div class="search-item form-validator">
                         <p class="item-name">Cơ sở <span class="col-red">*</span></p>
                         <select  class="autobox form-focus boder-ra-5" name ="brand" id="brand">
-                            <?php if($id_power != 3){ ?>
+                            <option value="<?php echo $resultsOutput -> id_brand ?>"><?php echo $resultsOutput -> brand ?></option>
                             <?php foreach ($resultsBrand as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
-                            <?php } }else{?>
-                                <option value="<?php echo $resultsBrandId -> id ?>" selected><?php echo $resultsBrandId -> name ?></option>
                             <?php }?>
                         </select>
                         <p class="form-message"></p>
@@ -103,7 +111,7 @@
                     <div class="search-item form-validator">
                         <p class="item-name">Chọn sản phẩm <span class="col-red">*</span></p>
                         <select  class="autobox form-focus boder-ra-5" name ="product" id="product" onChange="selectProd()">
-                            <option value="">Chọn sản phẩm</option>
+                            <option value="<?php echo $resultsOutput -> id_product ?>"><?php echo $resultsOutput -> product ?></option>
                             <?php foreach ($resultsProd as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
                             <?php } ?>
@@ -115,17 +123,17 @@
                         <p class="form-message"></p>
                     </div>
                     <div class="form-input form-validator">
-                        <p class="item-name">Số lượng hủy <span class="col-red">*</span></p>
-                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="" placeholder = "" onchange="checkQuantity()">
+                        <p class="item-name">Số lượng xuất ra <span class="col-red">*</span></p>
+                        <input type="number" class="form-focus boder-ra-5" name = "quantity" id="quantity" value="<?php echo $resultsOutput -> quantity ?>" placeholder = "" onchange="checkQuantity()">
                         <p class="form-message" id ="quantity-message"></p>
                     </div>
                     <div class="form-input form-validator">
                         <p class="item-name">Ghi chú</p>
-                        <textarea name="note" id="note" cols="10" rows="5" class="form-focus boder-ra-5 textarea"></textarea>
+                        <textarea name="note" id="note" cols="10" rows="5" class="form-focus boder-ra-5 textarea"><?php echo $resultsOutput -> note ?></textarea>
                         <p class="form-message"></p>
                     </div>
                     <div class="submit-form">
-                        <input type="submit" name="submit-form" class="btn btn-submit" value="Hủy hàng" id = "submits" style = "width: 100%;height: 45px;font-size: 18px;">
+                        <input type="submit" name="submit-form" class="btn btn-submit" value="Cập nhật" id = "submits" style = "width: 100%;height: 45px;font-size: 18px;">
                     </div>
                 </div>
             </form>
@@ -135,6 +143,46 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
+    
+    <!-- Thông báo thành công -->
+    <?php if($ok == 1){ ?>
+    <div class="noti">
+        <div class="success-checkmark">
+            <div class="check-icon">
+                <span class="icon-line line-tip"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./output-manage.php?brand=<?php echo $id_brand_output?>" class="btn">OK</a>
+        </div>
+    </div>
+    <?php }?>
+    <!-- Thông báo thất bại -->
+    <?php if($err == 1){ ?>
+    <div class="noti">
+        <div class="error-banmark">
+            <div class="ban-icon">
+                <span class="icon-line line-long-invert"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./edit-output-warehouse.php?id=<?php echo $id_output?>&brand=<?php $id_brand_output?>" class="btn">OK</a>        
+        </div>
+    </div>
+    <?php }?>
+
 
     <!-- Bắt lỗi nhập vào -->
     <script>
@@ -146,7 +194,7 @@
                 Validator.isRequired('#brand', 'Vui lòng chọn cơ sở'), 
                 Validator.isRequired('#product', 'Vui lòng chọn sản phẩm'),
                 Validator.isRequired('#quantity', 'Vui lòng nhập số lượng'),
-                Validator.isRequired('#note', 'Vui lòng ghi chú lí do'),
+                // Validator.isRequired('#note', 'Vui lòng ghi chú lí do'),
             ],
         });
     </script>
@@ -182,7 +230,7 @@
             var product = $("#product").val();
             var quantity= $("#quantity").val();
             jQuery.ajax({
-            url: "./include/get-quantity-cancel.php?brand="+ brand + "&product="+ product+ "&quantity=" + quantity,
+            url: "./include/get-quantity-output.php?brand="+ brand + "&product="+ product+ "&quantity=" + quantity,
             success: function(data) {
                 $("#quantity-message").html(data);
             },

@@ -4,6 +4,10 @@
     if (!isset($_SESSION['logins'])) {
         header('location:index.php');
     }else{
+        $err = "";
+        $ok = "";
+        $message = "";
+
         $id = $_GET['id'];
 
         $queryUser= $conn -> prepare("SELECT u.*, br.name FROM tbl_user u join tbl_brand br ON br.id = u.id_brand WHERE u.id = :id");
@@ -21,34 +25,42 @@
             $rPassword = $_POST['password-confirmation'];
             $brand = $_POST['brand'];
             $power = $_POST['power'];
+            $status = $_POST['status'];
 
             if($password != "" && $rPassword != "" ){
                 $passHash = password_hash($password,PASSWORD_DEFAULT);
 
-                $queryUser= $conn -> prepare("UPDATE tbl_user SET password= :password, fullname = :fullname, power = :power, id_brand = :id_brand WHERE id = :id ");
+                $queryUser= $conn -> prepare("UPDATE tbl_user SET password= :password, fullname = :fullname, power = :power, id_brand = :id_brand, status = :status WHERE id = :id ");
                 $queryUser->bindParam(':password',$passHash,PDO::PARAM_STR);
                 $queryUser->bindParam(':fullname',$fullname,PDO::PARAM_STR);
                 $queryUser->bindParam(':power',$power,PDO::PARAM_STR);
                 $queryUser->bindParam(':id_brand',$brand,PDO::PARAM_STR);
+                $queryUser->bindParam(':status',$status,PDO::PARAM_STR);
                 $queryUser->bindParam(':id',$id,PDO::PARAM_STR);
                 $queryUser-> execute();
                 if($queryUser){
-                    $msg = "Cập nhật thành công!";
-                }else{
-                    $error = "Thất bại! Vui lòng thử lại!";
+                    $ok = 1;
+                    $message = "Đã cập nhật thành công!";
+                }
+                else{
+                    $err = 1;
+                    $message = "Có lỗi xảy ra, vui lòng thử lại";
                 }
             }else{
-                $queryUser= $conn -> prepare("UPDATE tbl_user SET fullname = :fullname, power = :power, id_brand = :id_brand WHERE id = :id ");
+                $queryUser= $conn -> prepare("UPDATE tbl_user SET fullname = :fullname, power = :power, id_brand = :id_brand, status = :status WHERE id = :id ");
                 $queryUser->bindParam(':fullname',$fullname,PDO::PARAM_STR);
                 $queryUser->bindParam(':power',$power,PDO::PARAM_STR);
                 $queryUser->bindParam(':id_brand',$brand,PDO::PARAM_STR);
+                $queryUser->bindParam(':status',$status,PDO::PARAM_STR);
                 $queryUser->bindParam(':id',$id,PDO::PARAM_STR);
                 $queryUser-> execute();
                 if($queryUser){
-                    $msg = "Thành công!";
-                    header("Location: ./edit-user.php?id=".$id);
-                }else{
-                    $error = "Thất bại! Vui lòng thử lại!";
+                    $ok = 1;
+                    $message = "Đã cập nhật thành công!";
+                }
+                else{
+                    $err = 1;
+                    $message = "Có lỗi xảy ra, vui lòng thử lại";
                 }
             }
         }
@@ -84,15 +96,6 @@
             </section>
             <form action="" method="post" id = "frm-post">
                 <div class="input-new">
-                    <?php if(isset($error)){ ?>
-                        <div class="errorWrap">
-                            <strong>Lỗi: </strong><span><?php echo $error; ?> </span>
-                        </div>
-                    <?php }elseif(isset($msg)){ ?>
-                        <div class="succWrap">
-                            <strong>Thành công: </strong><span><?php echo $msg; ?> </span>
-                        </div>
-                    <?php } ?>
                     <div class="form-input form-validator">
                         <p class="item-name">Họ và tên</p>
                         <input type="text" class="form-focus boder-ra-5" name = "fullname" id="fullName" value="<?php echo $resultsUser -> fullname ?>" placeholder = "">
@@ -130,8 +133,18 @@
                             <option value="1" <?php echo (($resultsUser -> power )== 1)?"selected":"" ?>>Tài khoản quản trị</option>
                             <option value="2" <?php echo (($resultsUser -> power )== 2)?"selected":"" ?>>Tài khoản quản lý</option>
                             <option value="3" <?php echo (($resultsUser -> power )== 3)?"selected":"" ?>>Tài khoản nhân viên</option>
+                            <option value="4" <?php echo (($resultsUser -> power )== 4)?"selected":"" ?>>Tài khoản cộng tác viên</option>
                         </select>
                         <p class="form-message"></p>
+                    </div>
+                    <div class="status" style = "margin-top: 10px;">
+                        <p class="item-name" style = "font-size: 16px; font-weight: 700; margin-bottom: 5px">Trạng thái hiển thị </p>
+                        <label style = "margin-right: 15px;">
+                            <input type="radio" name="status" id="" value ="1" <?php if($resultsUser->status == 1) echo  "checked = 'Checked'" ?>> Hiện
+                        </label>
+                        <label>
+                            <input type="radio" name="status" value ="0" <?php if($resultsUser->status == 0) echo  "checked = 'Checked'" ?> id="" > Ẩn
+                        </label>
                     </div>
                     <div class="submit-form" style = "width: 50%">
                         <input type="submit" name="submit-form" class="btn btn-submit"  value="Cập nhật" style = "width: 100%;height: 45px;font-size: 18px;">
@@ -144,6 +157,47 @@
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
+
+    <!-- Thông báo thành công -->
+    <?php if($ok == 1){ ?>
+    <div class="noti">
+        <div class="success-checkmark">
+            <div class="check-icon">
+                <span class="icon-line line-tip"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./manage-user.php" class="btn">OK</a>
+        </div>
+    </div>
+    <?php }?>
+    <!-- Thông báo thất bại -->
+    <?php if($err == 1){ ?>
+    <div class="noti">
+        <div class="error-banmark">
+            <div class="ban-icon">
+                <span class="icon-line line-long-invert"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+            </div>
+            <div class="notification">
+                <p>
+                     <?php echo $message ?>
+                </p>
+            </div>
+            <a href="./edit-user.php?id=<?php echo $id?>" class="btn">OK</a>        
+        </div>
+    </div>
+    <?php }?>
+
+
     <script>
         Validator({
             form: '#frm-post',

@@ -10,7 +10,7 @@
             </div>
             <div class="notification">
                 <p>
-                    Thành công
+                  <?php echo $message ?>
                 </p>
             </div>
             <a href="./new-type.php" class="btn">OK</a>
@@ -29,7 +29,7 @@
             </div>
             <div class="notification">
                 <p>
-                    Có lỗi xảy ra, vui lòng thử lại!
+                  <?php echo $message ?>
                 </p>
             </div>
             <a href="./new-type.php" class="btn">OK</a>
@@ -63,7 +63,8 @@
 
 .success-checkmark,
 .error-banmark {
-  width: 380px;
+  max-width: 380px;
+  min-width: 300px;
   height: 230px;
   margin: 0 auto;
   grid-column: 2;
