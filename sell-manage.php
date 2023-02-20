@@ -13,14 +13,17 @@
         $ok = "";
         $message = "";
 
+
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             $fromDate = $_POST["from-date"];
             $toDate = $_POST["to-date"];
+            $id_brand =$_GET['brand'];
+            // var_dump($fromDate);
 
             $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date >= :fromDate AND sell.date <= :toDate");
-            $querySell->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
-            $querySell->bindParam('fromDate',$fromDate,PDO::PARAM_STR);
-            $querySell->bindParam('toDate',$toDate,PDO::PARAM_STR);
+            $querySell->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+            $querySell->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
+            $querySell->bindParam(':toDate',$toDate,PDO::PARAM_STR);
             $querySell-> execute();
             $resultsSell = $querySell->fetchAll(PDO::FETCH_OBJ);
 
@@ -28,8 +31,8 @@
             if(isset($_GET['brand']) && !isset($_GET['day']) || isset($_GET['brand']) && isset($_GET['day']) && $_GET['day'] == "today" ){
                 $id_brand =$_GET['brand'];
                 $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date = :today");
-                $querySell->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
-                $querySell->bindParam('today',$today,PDO::PARAM_STR);
+                $querySell->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+                $querySell->bindParam(':today',$today,PDO::PARAM_STR);
                 $querySell-> execute();
                 $resultsSell = $querySell->fetchAll(PDO::FETCH_OBJ);
             }
@@ -248,7 +251,7 @@
         function tableToExcel(){
             $("#table-manage").table2excel({
                 exclude: ".noExcel",
-                filename: "xuatkho.xls", 
+                filename: "quanlybanhang.xls", 
                 preserveColors: false
             });
         }

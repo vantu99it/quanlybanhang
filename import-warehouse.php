@@ -8,6 +8,7 @@
         $id_power = $_SESSION['logins']['power'];
         $id_brand = $_SESSION['logins']['id_brand'];
 
+
         $id_act = 1;
 
         //sản phẩm

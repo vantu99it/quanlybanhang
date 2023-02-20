@@ -218,9 +218,9 @@
                                     <p><?php echo $value -> note ?></p>
                                 </td>
                                 <td style = "text-align: center;">
-                                    <a href="./timekeeping-edit.php?id=<?php echo $value -> id ?>&brand=<?php echo $value -> id_brand ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
+                                    <?php if($id_power != 3){ ?>
+                                        <a href="./timekeeping-edit.php?id=<?php echo $value -> id ?>&brand=<?php echo $value -> id_brand ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
 
-                                   <?php if($id_power != 3){ ?>
                                         <a href="./timekeeping-brand-1.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa? Lưu ý: Xóa chấm công sẽ xóa hết chấm công của ngày! Cân nhắc kỹ!');" ><i class="fa-solid fa-trash"></i>
                                     <?php } ?>
                                 </td>
@@ -279,7 +279,7 @@
         function tableToExcel(){
             $("#table-manage").table2excel({
                 exclude: ".noExcel",
-                filename: "xuatkho.xls", 
+                filename: "chamcongCS1.xls", 
                 preserveColors: false
             });
         }

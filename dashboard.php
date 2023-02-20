@@ -25,7 +25,8 @@
         
         <!-- main-right -->
         <div id="main-right">
-            <?php echo $id_power ;?>
+            <h1>Xin chào: </h1>
+            <h3 class="col-red">Trang này đang hoàn thiện! Vui lòng nhấn vào nút 3 gạch để sử dụng các chức năng khác nhé!</h3>
         </div>
         <!-- /main-right -->
     </div>

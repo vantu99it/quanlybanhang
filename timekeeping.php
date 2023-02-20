@@ -1,6 +1,7 @@
 <?php 
     include './include/connect.php';
     include './include/func-slug.php';
+    date_default_timezone_set("Asia/Ho_Chi_Minh");
     if (!isset($_SESSION['logins'])) {
         header('location:index.php');
     }else{
@@ -266,8 +267,10 @@
     <script>
         $(document).ready(function () {
             const today = new Date();
-            today.setDate(today.getDate() - 1);
-            dateTime.min= today.toLocaleDateString('en-ca');
+            today.setDate(today.getDate()-1);
+            // dateTime.max= today.toLocaleDateString('en-ca');
+            dateTime.min = today.toISOString().split("T")[0];
+            dateTime.max = new Date().toISOString().split("T")[0];
         });
     </script>
 </body>

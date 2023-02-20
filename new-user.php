@@ -31,7 +31,6 @@
                 $queryUser->bindParam(':power',$power,PDO::PARAM_STR);
                 $queryUser->bindParam(':id_brand',$brand,PDO::PARAM_STR);
                 $queryUser-> execute();
-                $results = $queryUser->fetchAll(PDO::FETCH_OBJ);
                 $lastInsertId = $conn->lastInsertId();
                 if($lastInsertId){
                     $msg = "Tạo tài khoản thành công!";

@@ -25,7 +25,7 @@ require_once("./connect.php");
     $checkTotal = $input - $output;
     $check = $checkTotal - $quantity;
 
-    if($output > 0){
+    if($input > 0){
         if($check < 0){
             echo 'Số lượng kho chỉ còn <b>'.$checkTotal.'</b> => không thể xuất';
             echo "<script>$('#submits').prop('disabled',true);</script>";

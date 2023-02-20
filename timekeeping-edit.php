@@ -260,13 +260,5 @@
         };
     </script>
 
-    <!-- ngày -->
-    <script>
-        $(document).ready(function () {
-            const today = new Date();
-            today.setDate(today.getDate() - 1);
-            dateTime.min= today.toLocaleDateString('en-ca');
-        });
-    </script>
 </body>
 </html>

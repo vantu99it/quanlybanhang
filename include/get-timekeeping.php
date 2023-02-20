@@ -17,7 +17,7 @@ if(!empty($_GET["brand"]) && !empty($_GET["date"]) && !empty($_GET["time"]) && !
 
     if($query -> rowCount() > 0){
         $dateTime = date_format(date_create( $results -> date),"d/m/Y");
-        $createdTime = date_format(date_create( $results -> created_at)," H:i:s - d/m/Y");
+        $createdTime = date_format(date_create( $results -> created_at),"d/m/Y");
         $nameBrand =  $results -> nameBrand;
         if($time == 1 && $results -> morning != 0){
             $timeText = "Ca sáng";
