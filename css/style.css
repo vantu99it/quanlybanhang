@@ -126,9 +126,6 @@ body {
 
 /* ---- login ----- */
 .body-login {
-  background: linear-gradient(45deg, #ff216d, #2196f3);
-  position: relative;
-  min-height: 694px;
   color: #fff;
   text-align: center;
 }

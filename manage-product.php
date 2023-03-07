@@ -9,7 +9,7 @@
         $id_power = $_SESSION['logins']['power'];
         $id_brand = $_SESSION['logins']['id_brand'];
 
-        $queryPro= $conn -> prepare("SELECT pr.*, clas.name AS classify, us.username, uni.name AS unit FROM tbl_product pr JOIN tbl_classify clas ON clas.id = pr.id_classify JOIN tbl_user us on us.id = pr.id_user JOIN tbl_unit uni ON uni.id = pr.id_unit ");
+        $queryPro= $conn -> prepare("SELECT pr.*, clas.name AS classify, us.username, uni.name AS unit FROM tbl_product pr JOIN tbl_classify clas ON clas.id = pr.id_classify JOIN tbl_user us on us.id = pr.id_user JOIN tbl_unit uni ON uni.id = pr.id_unit ORDER BY clas.id ASC ");
         $queryPro-> execute();
         $resultsPro = $queryPro->fetchAll(PDO::FETCH_OBJ);
     }

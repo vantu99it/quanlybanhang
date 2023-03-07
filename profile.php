@@ -159,7 +159,7 @@
                     <?php echo $message ?>
                 </p>
             </div>
-            <a href="./profile.php" class="btn">OK</a>
+            <a href="./logout.php" class="btn">OK</a>
         </div>
     </div>
     <?php }?>

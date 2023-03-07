@@ -31,7 +31,7 @@
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style = "height: 100%;">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -41,7 +41,7 @@
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
 </head>
-<body >
+<body style = "background: linear-gradient(45deg, #ff216d, #2196f3); height: 100%" >
     <div class="body-login">
         <div class="container">
             <div class="login-form">

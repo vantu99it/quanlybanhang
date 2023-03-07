@@ -2,6 +2,10 @@
     $id_user = $_SESSION['logins']['id'];
     $id_power = $_SESSION['logins']['power'];
     $id_brand = $_SESSION['logins']['id_brand'];
+
+    $queryBrandId= $conn -> prepare("SELECT * FROM tbl_brand WHERE status = 1" );
+    $queryBrandId-> execute();
+    $resultsBrandId = $queryBrandId->fetchAll(PDO::FETCH_OBJ);
 ?>
 <div id="sidebar" class = "sidebar">
     <div class="sidebar-title">
@@ -26,11 +30,13 @@
                     <li class="menu-item-mini"><a href="./sell-manage.php?brand=1">Cơ sở 1</a></li>
                 <?php } elseif($id_power == 3 && $id_brand == 2  ){ ?>
                     <li class="menu-item-mini"><a href="./sell-manage.php?brand=2">Cơ sở 2</a></li>
-                <?php } else { ?>
-                    <li class="menu-item-mini"><a href="./sell-manage.php?brand=1">Cơ sở 1</a></li>
-                    <li class="menu-item-mini"><a href="./sell-manage.php?brand=2">Cơ sở 2</a></li>
-                    <li class="menu-item-mini"><a href="./sell-COD.php">Đơn COD</a></li>
+                <?php } else {  
+                    foreach ($resultsBrandId as $key => $value) {
+                ?>
+                    <li class="menu-item-mini"><a href="./sell-manage.php?brand=<?php echo $value -> id ?>"><?php echo $value -> name ?></a></li>
                 <?php } ?>
+                    <li class="menu-item-mini"><a href="./sell-COD.php">Đơn COD</a></li>
+                <?php }?>
             </ul>
         </li>
         <li class="menu-item">
@@ -78,7 +84,21 @@
                 <?php } ?>
             </ul>
         </li>
-        
+        <?php if($id_power != 3){ ?>
+            <li class="menu-item">
+                <a href="javascrip:void(0)">
+                   <iconify-icon class="icon" icon="carbon:summary-kpi" width="24" height="24"></iconify-icon>
+                    Quản lý báo cáo
+                    <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
+                </a>
+                <ul class="sidebar-menu-mini">
+                    <li class="menu-item-mini"><a href="./manage-total-warehouse.php">Kho hàng tổng</a></li>
+                    <li class="menu-item-mini"><a href="./manage-total-warehouse-none.php">Hết hàng</a></li>
+                    <li class="menu-item-mini"><a href="./manage-top-sales.php?brand=1">Top doanh số</a></li>
+                    <li class="menu-item-mini"><a href="./manage-top-quantity.php?brand=1">Top số lượng</a></li>
+                </ul>
+            </li>
+        <?php } ?>
         <li class="menu-item">
             <a href="javascrip:void(0)">
                 <iconify-icon class="icon" icon="fluent-mdl2:product-variant" width="24" height="24"></iconify-icon>
@@ -100,8 +120,9 @@
             </a>
             <ul class="sidebar-menu-mini">
                 <li class="menu-item-mini"><a href="./timekeeping.php">Chấm công</a></li>
-                <li class="menu-item-mini"><a href="./timekeeping-brand-1.php">Bảng chấm công CS1</a></li>
-                <li class="menu-item-mini"><a href="./timekeeping-brand-2.php">Bảng chấm công CS2</a></li>
+                <?php foreach ($resultsBrandId as $key => $value) { ?>
+                <li class="menu-item-mini"><a href="./timekeeping-brand.php?brand=<?php echo $value -> id ?>">Bảng chấm công CS<?php echo $value -> id ?></a></li>
+                <?php } ?>
             </ul>
         </li>
         

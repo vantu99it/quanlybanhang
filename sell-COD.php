@@ -10,12 +10,12 @@
         if(isset($_GET['brand'])){
             $id_brand = $_GET['brand'];
 
-            $queryCOD= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE pay.type = 'COD' AND sell.id_brand = :id_brand ");
+            $queryCOD= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname, br.name AS brand FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where JOIN tbl_brand br ON br.id = sell.id_brand WHERE pay.type = 'COD' AND sell.id_brand = id_brand ORDER BY sell.date ASC, sell.id ASC");
             $queryCOD->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
             $queryCOD-> execute();
             $resultsCOD = $queryCOD->fetchAll(PDO::FETCH_OBJ);
         }else{
-            $queryCOD= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE pay.type = 'COD'");
+            $queryCOD= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname, br.name AS brand FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where JOIN tbl_brand br ON br.id = sell.id_brand WHERE pay.type = 'COD' ORDER BY sell.date ASC, sell.id ASC");
             $queryCOD-> execute();
             $resultsCOD = $queryCOD->fetchAll(PDO::FETCH_OBJ);
         }
@@ -31,7 +31,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Quản lý xuất kho</title>
+    <title>Admin | Quản lý đơn COD</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
@@ -50,7 +50,7 @@
         <div id="main-right">
             <section class="main-right-title" style = "margin-bottom: 5px;">
                 <div class="form-title">
-                    <h1>Quản lý đơn hàng</h1>
+                    <h1>Quản lý COD</h1>
                 </div>
                 <div class="account-btn">
                     <a href="./sell-import.php" class="btn btn-post btn-add">Nhập đơn</a>
@@ -92,6 +92,7 @@
                             <th>Tổng</th>
                             <th>Nguồn</th>
                             <th class = "full-screen">Người bán</th>
+                            <th class = "full-screen">Cơ sở</th>
                             <th class = "full-screen">Ghi chú</th>
                             <th>Hành động</th>
                         </tr>
@@ -108,7 +109,7 @@
                                         ?>
                                     </p>
                                 </td>
-                                <td>
+                                <td style = "text-align: left;">
                                     <p><?php echo $value -> product?></p>
                                 </td>
                                 <td>
@@ -149,6 +150,9 @@
                                 </td>
                                 <td class = "full-screen">
                                     <p><?php echo $value -> fullname ?></p>
+                                </td>
+                                <td class = "full-screen">
+                                    <p><?php echo $value -> brand ?></p>
                                 </td>
                                 <td class = "full-screen">
                                     <p><?php echo $value -> note ?></p>

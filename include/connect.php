@@ -6,7 +6,7 @@
     $username = "root";
     $password = "";
     try {
-        $conn = new PDO("mysql:host=$servername;dbname=quanlybanhang", $username, $password);
+        $conn = new PDO("mysql:host=$servername;dbname=quanlybanhang1", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         // echo "Kết nối thành công";
     } catch(PDOException $e) {

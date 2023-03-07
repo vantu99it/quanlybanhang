@@ -1,18 +1,43 @@
 <?php 
     include './include/connect.php';
     include './include/func-slug.php';
+    date_default_timezone_set("Asia/Ho_Chi_Minh");
     if (!isset($_SESSION['logins'])) {
         header('location:index.php');
     }else{
         $id_user = $_SESSION['logins']['id'];
         $id_power = $_SESSION['logins']['power'];
         // $id_brand = $_SESSION['logins']['id_brand'];
-        $today = date('Y-m-d');
+
+        if(date('d')<13){
+            $monthFrom =(int) date('m')-1;
+            $monthFrom = ($monthFrom < 10) ? "0".$monthFrom : $monthFrom;
+            $monthTo =(int) date('m');
+            $monthTo = ($monthTo < 10) ? "0".$monthTo : $monthTo;
+        }else{
+            $monthFrom =(int) date('m');
+            $monthFrom = ($monthFrom < 10) ? "0".$monthFrom : $monthFrom;
+            $monthTo =(int) date('m')+1;
+            $monthTo = ($monthTo < 10) ? "0".$monthTo : $monthTo;
+        }
+        $year =date('Y');
+        if(isset($_GET['brand']) && $_GET['brand'] == 1){
+            $fromDate = $year."-".$monthFrom."-14";
+            $toDate = $year."-".$monthTo."-13";
+        }else{
+             $fromDate = $year."-".$monthFrom."-22";
+            $toDate = $year."-".$monthTo."-21";
+        }
+        
+
+        // var_dump($fromDate);
+        // var_dump($toDate); die();
+
 
         $err = "";
         $ok = "";
         $message = "";
-
+        $id_brand =$_GET['brand'];
 
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             $fromDate = $_POST["from-date"];
@@ -20,29 +45,23 @@
             $id_brand =$_GET['brand'];
             // var_dump($fromDate);
 
-            $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date >= :fromDate AND sell.date <= :toDate ORDER BY sell.date DESC, sell.id ASC" );
-            $querySell->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-            $querySell->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
-            $querySell->bindParam(':toDate',$toDate,PDO::PARAM_STR);
-            $querySell-> execute();
-            $resultsSell = $querySell->fetchAll(PDO::FETCH_OBJ);
-
+            $querySales= $conn -> prepare("SELECT pro.name AS product, pro.detail,pro.id, sum(sell.total) AS total from tbl_sell_manage sell JOIN tbl_product pro ON pro.id = sell.id_product WHERE sell.date <= :toDate AND sell.date >= :fromDate AND sell.id_brand = :id_brand GROUP BY  pro.id ORDER BY sum(sell.total) DESC " );
+            $querySales->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+            $querySales->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
+            $querySales->bindParam(':toDate',$toDate,PDO::PARAM_STR);
+            $querySales-> execute();
+            $resultsSales = $querySales->fetchAll(PDO::FETCH_OBJ);
         }else{
-            if(isset($_GET['brand']) && !isset($_GET['day']) || isset($_GET['brand']) && isset($_GET['day']) && $_GET['day'] == "today" ){
-                $id_brand =$_GET['brand'];
-                $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date = :today ORDER BY sell.date DESC, sell.id ASC");
-                $querySell->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-                $querySell->bindParam(':today',$today,PDO::PARAM_STR);
-                $querySell-> execute();
-                $resultsSell = $querySell->fetchAll(PDO::FETCH_OBJ);
-            }
+            $querySales= $conn -> prepare("SELECT pro.name AS product, pro.detail,pro.id, sum(sell.total) AS total from tbl_sell_manage sell JOIN tbl_product pro ON pro.id = sell.id_product WHERE sell.date <= :toDate AND sell.date >= :fromDate AND sell.id_brand = :id_brand GROUP BY  pro.id ORDER BY sum(sell.total) DESC " );
+            $querySales->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+            $querySales->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
+            $querySales->bindParam(':toDate',$toDate,PDO::PARAM_STR);
+            $querySales-> execute();
+            $resultsSales = $querySales->fetchAll(PDO::FETCH_OBJ);
+
         }
-       $sum=0;
-        foreach ($resultsSell as $key => $value) {
-            $sum += (int) $value->total;
-        } 
         // Xóa
-        $id_brand =$_GET['brand'];
+       
         if(isset($_REQUEST['del'])&&($_REQUEST['del'])){
             $delId = intval($_GET['del']);
             
@@ -66,7 +85,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Quản lý xuất kho</title>
+    <title>Admin | Top doanh số</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
@@ -85,13 +104,16 @@
         <div id="main-right">
             <section class="main-right-title" style = "margin-bottom: 5px;">
                 <div class="form-title">
-                    <h1>Quản lý đơn hàng cơ sở <?php echo $_GET['brand'] ?></h1>
-                </div>
-                <div class="account-btn">
-                    <a href="./sell-import.php" class="btn btn-post btn-add">Nhập đơn</a>
+                    <h1>Top doanh số cơ sở <?php echo $_GET['brand'] ?></h1>
                 </div>
             </section>
             <section class="main-right-filter">
+                <div class="account-btn">
+                    <a href="./manage-top-sales.php?brand=1" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 1){echo "btn-active";}?>">Cơ sở 1</a>
+                </div>
+                <div class="account-btn">
+                    <a href="./manage-top-sales.php?brand=2" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 2){echo "btn-active";}?>">Cơ sở 2</a>
+                </div>
                 <form action="" method="post">
                     <span>Từ</span>
                     <input type="date" name="from-date" id="from-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($fromDate)? $fromDate : $today ?>">
@@ -99,82 +121,48 @@
                     <input type="date" name="to-date" id="to-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($toDate)? $toDate :$today ?>">
                     <input type="submit" value="Lọc" class="btn btn-post btn-add">
                 </form>
-                <div class="account-btn">
-                    <a href="./sell-manage.php?brand=<?php echo $_GET['brand']?>&day=today" class="btn btn-post btn-add <?php if(!isset($_GET['brand'])&&!isset($_GET['today'])&&$_GET['today']= $today){echo "btn-active";}?>" >Hôm nay</a>
-                </div>
                 <?php if($id_power != 3){ ?>
                     <div class="account-btn full-screen">
                         <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
                     </div>
                 <?php } ?>
             </section>
-            <section class="main-right-filter">
-                <p>Tổng tiền: <b class="col-red">
-                    <?php 
-                        $bien = number_format($sum,0,",",".");
-                        echo $bien."đ";
-                    ?>
-                </b></p>
-            </section>
             <div class="main-right-table">
                 <table class="table table-bordered table-post-list" id = "table-manage">
                     <thead>
                         <tr>
-                            <th class = "full-screen" >STT</th>
-                            <th>Ngày bán</th>
+                            <th class = "full-screen">STT</th>
                             <th>Sản phẩm</th>
+                            <th class = "full-screen">Tên đầy đủ</th>
                             <th>Số lượng</th>
-                            <th>Giảm</th>
-                            <th>Cộng</th>
-                            <th>Tình trạng</th>
-                            <th>Tổng</th>
-                            <th>Nguồn</th>
-                            <th class = "full-screen">Người bán</th>
-                            <th class = "full-screen">Ghi chú</th>
-                            <th>Hành động</th>
+                            <th>Tiền</th>
+                            <th>Top</th>
                         </tr>
                         
                     </thead>
                     <tbody >
-                        <?php foreach ( $resultsSell as $key => $value) { ?>
+                        <?php foreach ( $resultsSales as $key => $value) { ?>
                             <tr>
                                 <td class = "full-screen"><?php echo $key+1 ?></td>
-                                <td>
-                                    <p>
-                                        <?php 
-                                            echo date_format(date_create( $value -> date),"d-m")
-                                        ?>
-                                    </p>
-                                </td>
-                                <td>
+                                <td style = "text-align: left;">
                                     <p><?php echo $value -> product?></p>
                                 </td>
-                                <td>
-                                    <p><?php echo $value -> quantity ?></p>
+                                <td style = "text-align: left;" class = "full-screen">
+                                    <p><?php echo $value -> detail ?></p>
                                 </td>
                                 <td>
-                                    <p>
+                                    <p >
                                         <?php 
-                                            $tien = (int) $value -> sale;
-                                            $bien = number_format($tien,0,",",".");
-                                            echo $bien."đ";
+                                            $queryQuantity= $conn -> prepare("SELECT sum(quantity) as quantity FROM tbl_sell_manage WHERE id_product = :id_product" );
+                                            $queryQuantity->bindParam(':id_product',$value -> id,PDO::PARAM_STR);
+                                            $queryQuantity-> execute();
+                                            $resultsQuantity = $queryQuantity->fetch(PDO::FETCH_OBJ);
+                                            echo $resultsQuantity -> quantity;
                                         ?>
                                      </p>
                                 </td>
                                 <td>
-                                    <p>
-                                        <?php 
-                                            $tien = (int) $value -> plus;
-                                            $bien = number_format($tien,0,",",".");
-                                            echo $bien."đ";
-                                        ?>
-                                     </p>
-                                </td>
-                                <td>
-                                    <p><?php echo $value -> payment ?></p>
-                                </td>
-                                <td>
-                                    <p>
+                                    <p style = "color: red; font-weight: bold;">
                                         <?php 
                                             $tien = (int) $value -> total;
                                             $bien = number_format($tien,0,",",".");
@@ -183,20 +171,7 @@
                                      </p>
                                 </td>
                                 <td>
-                                    <p><?php echo $value -> from_where ?></p>
-                                </td>
-                                <td class = "full-screen">
-                                    <p><?php echo $value -> fullname ?></p>
-                                </td>
-                                <td class = "full-screen">
-                                    <p><?php echo $value -> note ?></p>
-                                </td>
-                                <td style = "text-align: center;">
-                                    <a href="./sell-edit.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
-
-                                   <?php if($id_power != 3){ ?>
-                                        <a href="./sell-manage.php?brand=<?php echo $id_brand?>&del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
-                                    <?php } ?>
+                                    <p><?php echo "Top ".($key+1) ?></p>
                                 </td>
                             </tr>
                         <?php } ?>
@@ -251,7 +226,7 @@
         function tableToExcel(){
             $("#table-manage").table2excel({
                 exclude: ".noExcel",
-                filename: "quanlybanhang.xls", 
+                filename: "topdoanhso.xls", 
                 preserveColors: false
             });
         }

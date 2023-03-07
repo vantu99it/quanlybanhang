@@ -37,69 +37,83 @@
             $date = $_POST["date"];
             $time = $_POST["time"];
             $note = $_POST["note"];
+            
+            $date1 = date("d", strtotime($date));
+            $date2 = date("d", time());
+            $checkTime = (int) ($date2 - $date1);
+            // var_dump($date1); 
+            // var_dump($date2); 
+            // var_dump($checkTime); die();
 
-            // kiểm tra đã tồn tại ngày hay chưa
-            $queryDate= $conn -> prepare("SELECT * FROM tbl_timekeeping WHERE date = :date AND id_brand = :id_brand");
-            $queryDate->bindParam(':date',$date,PDO::PARAM_STR);
-            $queryDate->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-            $queryDate-> execute();
-            $resultsDate = $queryDate->fetch(PDO::FETCH_OBJ);
-            // var_dump($time); die();
-            if($queryDate->rowCount() == 0){
-                if($time == '1'){
-                    $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, morning, id_brand, note) value (:date, :time, :id_brand, :note)");
-                }elseif($time == '2'){
-                    $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, noon, id_brand, note) value (:date, :time, :id_brand, :note)");
-                }elseif($time == '3'){
-                    $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, afternoon, id_brand, note) value (:date, :time, :id_brand, :note)");
-                }else{
-                    $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, evening, id_brand, note) value (:date, :time, :id_brand, :note)");
-                }
-                $queryTimeKeep->bindParam(':date',$date,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':time',$id_user,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':note',$note,PDO::PARAM_STR);
-                $queryTimeKeep-> execute();
-                $lastInsertId = $conn->lastInsertId();
-                if($lastInsertId){
-                    $ok = 1;
-                    $message = "Đã chấm công thành công!";
+            if($checkTime == 0 || $checkTime == 1){
+                // kiểm tra đã tồn tại ngày hay chưa
+                $queryDate= $conn -> prepare("SELECT * FROM tbl_timekeeping WHERE date = :date AND id_brand = :id_brand");
+                $queryDate->bindParam(':date',$date,PDO::PARAM_STR);
+                $queryDate->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+                $queryDate-> execute();
+                $resultsDate = $queryDate->fetch(PDO::FETCH_OBJ);
+                // var_dump($time); die();
+                if($queryDate->rowCount() == 0){
+                    if($time == '1'){
+                        $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, morning, id_brand, note) value (:date, :time, :id_brand, :note)");
+                    }elseif($time == '2'){
+                        $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, noon, id_brand, note) value (:date, :time, :id_brand, :note)");
+                    }elseif($time == '3'){
+                        $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, afternoon, id_brand, note) value (:date, :time, :id_brand, :note)");
+                    }else{
+                        $queryTimeKeep= $conn -> prepare("INSERT INTO tbl_timekeeping (date, evening, id_brand, note) value (:date, :time, :id_brand, :note)");
+                    }
+                    $queryTimeKeep->bindParam(':date',$date,PDO::PARAM_STR);
+                    $queryTimeKeep->bindParam(':time',$id_user,PDO::PARAM_STR);
+                    $queryTimeKeep->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+                    $queryTimeKeep->bindParam(':note',$note,PDO::PARAM_STR);
+                    $queryTimeKeep-> execute();
+                    $lastInsertId = $conn->lastInsertId();
+                    if($lastInsertId){
+                        $ok = 1;
+                        $message = "Đã chấm công thành công!";
+                    }
+                    else{
+                        $err = 1;
+                        $message = "Có lỗi xảy ra, vui lòng thử lại";
+                    }
                 }
                 else{
-                    $err = 1;
-                    $message = "Có lỗi xảy ra, vui lòng thử lại";
-                }
-            }
-            else{
-                $noteStory =  $resultsDate->note;
-                $noteNew = $noteStory."/.".$note;
+                    $noteStory =  $resultsDate->note;
+                    $noteNew = $noteStory."/.".$note;
 
-                if($time == '1'){
-                    $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET morning = :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
-                }elseif($time == '2'){
-                    $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET noon= :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
-                }elseif($time == '3'){
-                    $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET afternoon= :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
-                }elseif($time == '4'){
-                    $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET evening= :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
-                }else{
-                    $error = "Thất bại! Vui lòng thử lại!";
-                }
-                $queryTimeKeep->bindParam(':date',$date,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':time',$id_user,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
-                $queryTimeKeep->bindParam(':note',$noteNew,PDO::PARAM_STR);
-                $queryTimeKeep-> execute();
-                if($queryTimeKeep){
-                    $ok = 1;
-                    $message = "Đã chấm công thành công!";
-                }
-                else{
-                    $err = 1;
-                    $message = "Có lỗi xảy ra, vui lòng thử lại";
-                }
+                    if($time == '1'){
+                        $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET morning = :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
+                    }elseif($time == '2'){
+                        $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET noon= :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
+                    }elseif($time == '3'){
+                        $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET afternoon= :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
+                    }elseif($time == '4'){
+                        $queryTimeKeep= $conn -> prepare("UPDATE tbl_timekeeping SET evening= :time, note = :note WHERE date = :date AND id_brand = :id_brand ");
+                    }else{
+                        $error = "Thất bại! Vui lòng thử lại!";
+                    }
+                    $queryTimeKeep->bindParam(':date',$date,PDO::PARAM_STR);
+                    $queryTimeKeep->bindParam(':time',$id_user,PDO::PARAM_STR);
+                    $queryTimeKeep->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+                    $queryTimeKeep->bindParam(':note',$noteNew,PDO::PARAM_STR);
+                    $queryTimeKeep-> execute();
+                    if($queryTimeKeep){
+                        $ok = 1;
+                        $message = "Đã chấm công thành công!";
+                    }
+                    else{
+                        $err = 1;
+                        $message = "Có lỗi xảy ra, vui lòng thử lại";
+                    }
             }
         }
+        else{
+                $err = 1;
+                $message = "Chỉ được chấm đúng hoặc muộn 1 ngày!";
+            
+            }
+       }
     }
 ?>
 <!DOCTYPE html>
