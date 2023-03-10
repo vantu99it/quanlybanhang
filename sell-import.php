@@ -28,11 +28,8 @@
         $queryBrand-> execute();
         $resultsBrand = $queryBrand->fetchAll(PDO::FETCH_OBJ);
 
-        //cơ sở theo id
-        $queryBrandId= $conn -> prepare("SELECT * FROM tbl_brand WHERE status = 1 AND id =:id");
-        $queryBrandId->bindParam(':id',$id_brand,PDO::PARAM_STR);
-        $queryBrandId-> execute();
-        $resultsBrandId = $queryBrandId->fetch(PDO::FETCH_OBJ);
+
+
 
         //thanh toán
         $queryPay= $conn -> prepare("SELECT * FROM tbl_payment_status WHERE status = 1");
@@ -142,7 +139,13 @@
                             <?php if($id_power != 3){ ?>
                                 <?php foreach ($resultsBrand as $key => $value) { ?>
                                     <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
-                                <?php } }else{?>
+                                <?php } }else{
+                                        //cơ sở theo id
+                                $queryBrandId= $conn -> prepare("SELECT * FROM tbl_brand WHERE status = 1 AND id =:id");
+                                $queryBrandId->bindParam(':id',$id_brand,PDO::PARAM_STR);
+                                $queryBrandId-> execute();
+                                $resultsBrandId = $queryBrandId->fetch(PDO::FETCH_OBJ);
+                                ?>
                                     <option value="<?php echo $resultsBrandId -> id ?>" selected><?php echo $resultsBrandId -> name ?></option>
                                 <?php } ?>
                             

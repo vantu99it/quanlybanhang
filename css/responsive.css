@@ -3,6 +3,16 @@
 @media only screen and (max-width: 1023px) {
 }
 @media only screen and (max-width: 767px) {
+  /* dashboard */
+  .frame-info {
+    padding: 4px;
+  }
+  .price-old {
+    font-size: 12px;
+  }
+  .price-news {
+    font-size: 14px;
+  }
   /* heaser-menu */
   .header-menu {
     display: block;
@@ -54,6 +64,9 @@
   }
 }
 @media only screen and (max-width: 599px) {
+  .frame-item {
+    width: clamp(145px, 45%, 180px);
+  }
 }
 @media only screen and (max-width: 479px) {
 }

@@ -3,9 +3,9 @@
     $id_power = $_SESSION['logins']['power'];
     $id_brand = $_SESSION['logins']['id_brand'];
 
-    $queryBrandId= $conn -> prepare("SELECT * FROM tbl_brand WHERE status = 1" );
-    $queryBrandId-> execute();
-    $resultsBrandId = $queryBrandId->fetchAll(PDO::FETCH_OBJ);
+    $queryBrandIds= $conn -> prepare("SELECT * FROM tbl_brand WHERE status = 1" );
+    $queryBrandIds-> execute();
+    $resultsBrandIds = $queryBrandIds->fetchAll(PDO::FETCH_OBJ);
 ?>
 <div id="sidebar" class = "sidebar">
     <div class="sidebar-title">
@@ -31,7 +31,7 @@
                 <?php } elseif($id_power == 3 && $id_brand == 2  ){ ?>
                     <li class="menu-item-mini"><a href="./sell-manage.php?brand=2">Cơ sở 2</a></li>
                 <?php } else {  
-                    foreach ($resultsBrandId as $key => $value) {
+                    foreach ($resultsBrandIds as $key => $value) {
                 ?>
                     <li class="menu-item-mini"><a href="./sell-manage.php?brand=<?php echo $value -> id ?>"><?php echo $value -> name ?></a></li>
                 <?php } ?>
@@ -96,6 +96,7 @@
                     <li class="menu-item-mini"><a href="./manage-total-warehouse-none.php">Hết hàng</a></li>
                     <li class="menu-item-mini"><a href="./manage-top-sales.php?brand=1">Top doanh số</a></li>
                     <li class="menu-item-mini"><a href="./manage-top-quantity.php?brand=1">Top số lượng</a></li>
+                    <li class="menu-item-mini"><a href="./collaborators.php?brand=1">Cộng tác viên</a></li>
                 </ul>
             </li>
         <?php } ?>
@@ -120,7 +121,7 @@
             </a>
             <ul class="sidebar-menu-mini">
                 <li class="menu-item-mini"><a href="./timekeeping.php">Chấm công</a></li>
-                <?php foreach ($resultsBrandId as $key => $value) { ?>
+                <?php foreach ($resultsBrandIds as $key => $value) { ?>
                 <li class="menu-item-mini"><a href="./timekeeping-brand.php?brand=<?php echo $value -> id ?>">Bảng chấm công CS<?php echo $value -> id ?></a></li>
                 <?php } ?>
             </ul>
@@ -140,7 +141,19 @@
                 <li class="menu-item-mini"><a href="./profile.php">Tài khoản cá nhân</a></li>
             </ul>
         </li>
-
+        <?php if($id_power != 3){ ?>
+            <li class="menu-item">
+                <a href="javascrip:void(0)">
+                   <iconify-icon class="icon" icon="foundation:burst-sale" width="24" height="24"></iconify-icon>
+                    Quản lý giảm giá
+                    <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
+                </a>
+                <ul class="sidebar-menu-mini">
+                    <li class="menu-item-mini"><a href="./sale-new.php">Thêm mới</a></li>
+                    <li class="menu-item-mini"><a href="./sale-manage.php">Quản lý</a></li>
+                </ul>
+            </li>
+        <?php } ?>
         <?php if($id_power != 3){ ?>
             <li class="menu-item">
                 <a href="javascrip:void(0)">
