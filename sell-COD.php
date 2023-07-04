@@ -10,8 +10,8 @@
         if(isset($_GET['brand'])){
             $id_brand = $_GET['brand'];
 
-            $queryCOD= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname, br.name AS brand FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where JOIN tbl_brand br ON br.id = sell.id_brand WHERE pay.type = 'COD' AND sell.id_brand = id_brand ORDER BY sell.date ASC, sell.id ASC");
-            $queryCOD->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
+            $queryCOD= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname, br.name AS brand FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where JOIN tbl_brand br ON br.id = sell.id_brand WHERE pay.type = 'COD' AND sell.id_brand = :id_brand ORDER BY sell.date ASC, sell.id ASC");
+            $queryCOD->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $queryCOD-> execute();
             $resultsCOD = $queryCOD->fetchAll(PDO::FETCH_OBJ);
         }else{
@@ -158,7 +158,7 @@
                                     <p><?php echo $value -> note ?></p>
                                 </td>
                                 <td style = "text-align: center;">
-                                    <a href="./edit-user.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
+                                    <a href="./sell-edit.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
 
                                    <?php if($id_power != 3){ ?>
                                         <a href="./categories.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>

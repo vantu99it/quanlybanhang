@@ -1,8 +1,6 @@
 <?php 
 require_once("./connect.php");
 
-
-
 if(!empty($_GET["sale"]) && !empty($_GET["pro"]) ) {
 	$sale = $_GET["sale"];
 	$id_product = $_GET["pro"];

@@ -84,3 +84,19 @@ $(document).ready(function () {
     $(".form-act").fadeOut(500);
   });
 });
+
+$(document).ready(function () {
+  $(".post-button").click(function () {
+    var id_detail = $(this).data("id");
+    $.ajax({
+      url: "./include/get-sell-manager-detail.php?id_detail=" + id_detail,
+      success: function (response) {
+        $("#result").html(response);
+        $("#result").addClass("active");
+      },
+      error: function (xhr) {
+        console.log(xhr.responseText);
+      },
+    });
+  });
+});

@@ -680,3 +680,50 @@ body {
   outline-color: #41ff00;
   margin: 4px 0 5px;
 }
+
+/* form detal */
+#result {
+  display: none;
+}
+#result.active {
+  display: block;
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgb(0 0 0 / 30%);
+}
+#result.active .table-detail {
+  width: 50vw;
+  margin: 20px auto;
+  background: #fff;
+  position: relative;
+}
+#result.active #close_x {
+  position: absolute;
+  background: none;
+  border: none;
+  top: -25px;
+  right: -25px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  z-index: 100000000;
+}
+#result.active #close_x i {
+  font-size: 25px;
+  color: red;
+  background: #fff;
+  border-radius: 50%;
+}
+#result.active .title {
+  color: #000;
+  font-weight: 700;
+  text-align: center;
+}
+#result.active table {
+  text-align: center;
+  color: #000;
+}

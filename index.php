@@ -5,7 +5,7 @@
         $user = $_POST['username'];
         $pass = $_POST['password'];
 
-		$query= $conn -> prepare("SELECT * FROM tbl_user WHERE username=:username");
+		$query= $conn -> prepare("SELECT * FROM tbl_user WHERE username=:username and status = 1");
 		$query-> bindParam(':username', $user, PDO::PARAM_STR);
 		$query-> execute();
 		$results = $query->fetch(PDO::FETCH_OBJ);

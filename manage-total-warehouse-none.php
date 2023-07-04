@@ -53,7 +53,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Quản lý hàng hóa</title>
+    <title>Admin | Quản lý hàng hết</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
@@ -75,22 +75,23 @@
                     <h1>Quản lý hàng hết <?php echo isset($_GET['brand'])?"cơ sở ".$_GET['brand']:""?></h1>
                 </div>
             </section>
-            <?php if($id_power != 3){ ?>
-                <section class="main-right-filter">
-                    <div class="account-btn">
-                        <a href="./manage-total-warehouse-none.php" class="btn btn-post btn-add <?php if(!isset($_GET['brand'])){echo "btn-active";}?>" >Tất cả</a>
-                    </div>
-                    <div class="account-btn">
-                        <a href="./manage-total-warehouse-none.php?brand=1" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 1){echo "btn-active";}?>">Cơ sở 1</a>
-                    </div>
-                    <div class="account-btn">
-                        <a href="./manage-total-warehouse-none.php?brand=2" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 2){echo "btn-active";}?>">Cơ sở 2</a>
-                    </div>
+            
+            <section class="main-right-filter">
+                <div class="account-btn">
+                    <a href="./manage-total-warehouse-none.php" class="btn btn-post btn-add <?php if(!isset($_GET['brand'])){echo "btn-active";}?>" >Tất cả</a>
+                </div>
+                <div class="account-btn">
+                    <a href="./manage-total-warehouse-none.php?brand=1" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 1){echo "btn-active";}?>">Cơ sở 1</a>
+                </div>
+                <div class="account-btn">
+                    <a href="./manage-total-warehouse-none.php?brand=2" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 2){echo "btn-active";}?>">Cơ sở 2</a>
+                </div>
+                <?php if($id_power != 3){ ?>
                     <div class="account-btn full-screen">
                         <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
                     </div>
-                </section>
-            <?php } ?>
+                <?php } ?>
+            </section>
             <div class="main-right-table">
                 <table class="table table-bordered table-post-list" id = "table-manage">
                     <thead>

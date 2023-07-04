@@ -86,7 +86,7 @@
                 $total = $price * $quantity - $sale + $plus;
             }
 
-            $queryWare= $conn -> prepare("UPDATE tbl_sell_manage SET id_brand = :id_brand, id_user_sell = :id_user_sell, date = :date, id_product = :id_product, quantity = :quantity, sale = :sale, plus = :plus, total = :total, id_payment_status = :id_payment_status , id_from_where = :id_from_where, id_user = :id_user, note = :note WHERE id = :id ");
+            $queryWare= $conn -> prepare("UPDATE tbl_sell_manage SET id_brand = :id_brand, id_user_sell = :id_user_sell, date = :date, id_product = :id_product, quantity = :quantity, sale = :sale, plus = :plus, total = :total, id_payment_status = :id_payment_status , id_from_where = :id_from_where, id_user = :id_user, note = :note, update_ad = NOW() WHERE id = :id ");
             $queryWare->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $queryWare->bindParam(':id_user_sell',$id_user_sell,PDO::PARAM_STR);
             $queryWare->bindParam(':date',$date,PDO::PARAM_STR);
@@ -249,7 +249,7 @@
                     </div>
 
                     <div class="submit-form">
-                        <input type="submit" name="submit-form" class="btn btn-submit" id = "submits"  value="Tạo đơn" style = "width: 100%;height: 45px;font-size: 18px;">
+                        <input type="submit" name="submit-form" class="btn btn-submit" id = "submits"  value="Cập nhật" style = "width: 100%;height: 45px;font-size: 18px;">
                     </div>
                 </div>
             </form>

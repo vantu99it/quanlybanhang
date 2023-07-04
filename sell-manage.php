@@ -20,21 +20,38 @@
             $id_brand =$_GET['brand'];
             // var_dump($fromDate);
 
-            $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date >= :fromDate AND sell.date <= :toDate ORDER BY sell.date DESC, sell.id ASC" );
+            $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user_sell  JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date >= :fromDate AND sell.date <= :toDate ORDER BY sell.date DESC, sell.id ASC" );
             $querySell->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $querySell->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
             $querySell->bindParam(':toDate',$toDate,PDO::PARAM_STR);
             $querySell-> execute();
             $resultsSell = $querySell->fetchAll(PDO::FETCH_OBJ);
 
+
+            $queryTotalBank= $conn -> prepare("SELECT sum(sell.total) as sumtotal FROM tbl_sell_manage sell WHERE sell.id_brand = :id_brand AND sell.date >= :fromDate AND sell.date <= :toDate AND sell.id_payment_status = 1 " );
+            $queryTotalBank->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+            $queryTotalBank->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
+            $queryTotalBank->bindParam(':toDate',$toDate,PDO::PARAM_STR);
+            $queryTotalBank-> execute();
+            $resultsTotalBank = $queryTotalBank->fetch(PDO::FETCH_OBJ);
+            $totalBank = $resultsTotalBank-> sumtotal;
+
         }else{
             if(isset($_GET['brand']) && !isset($_GET['day']) || isset($_GET['brand']) && isset($_GET['day']) && $_GET['day'] == "today" ){
                 $id_brand =$_GET['brand'];
-                $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date = :today ORDER BY sell.date DESC, sell.id ASC");
+                $querySell= $conn -> prepare("SELECT sell.*, pro.name AS product, pay.name as payment, frm.name AS from_where, us.fullname AS fullname FROM tbl_sell_manage sell JOIN tbl_user us ON us.id = sell.id_user_sell  JOIN tbl_product pro on pro.id = sell.id_product JOIN tbl_payment_status pay ON pay.id = sell.id_payment_status JOIN tbl_from_where frm ON frm.id = sell.id_from_where WHERE sell.id_brand = :id_brand AND sell.date = :today ORDER BY sell.date DESC, sell.id ASC");
                 $querySell->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
                 $querySell->bindParam(':today',$today,PDO::PARAM_STR);
                 $querySell-> execute();
                 $resultsSell = $querySell->fetchAll(PDO::FETCH_OBJ);
+
+                //total bank
+                $queryTotalBank= $conn -> prepare("SELECT sum(sell.total) as sumtotal FROM tbl_sell_manage sell WHERE sell.id_brand = :id_brand AND sell.date = :today AND sell.id_payment_status = 1 ");
+                $queryTotalBank->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+                $queryTotalBank->bindParam(':today',$today,PDO::PARAM_STR);
+                $queryTotalBank-> execute();
+                $resultsTotalBank = $queryTotalBank->fetch(PDO::FETCH_OBJ);
+                $totalBank = $resultsTotalBank-> sumtotal;
             }
         }
        $sum=0;
@@ -115,6 +132,19 @@
                         echo $bien."đ";
                     ?>
                 </b></p>
+                <p style = "margin-left: 10px">Tiền mặt: <b class="col-red">
+                    <?php 
+                        $bien_Bank = number_format($totalBank,0,",",".");
+                        echo $bien_Bank."đ";
+                    ?>
+                </b></p>
+                <p style = "margin-left: 10px">Khác: <b class="col-red">
+                    <?php 
+                        $remaining = $sum - $totalBank;
+                        $bien_remaining = number_format($remaining,0,",",".");
+                        echo $bien_remaining."đ";
+                    ?>
+                </b></p>
             </section>
             <div class="main-right-table">
                 <table class="table table-bordered table-post-list" id = "table-manage">
@@ -171,7 +201,7 @@
                                      </p>
                                 </td>
                                 <td>
-                                    <p><?php echo $value -> payment ?></p>
+                                    <p <?php echo  ($value -> payment == 'Chuyển khoản')? 'style ="color: #3961fb"': "" ?>><?php echo $value -> payment ?></p>
                                 </td>
                                 <td>
                                     <p>
@@ -195,8 +225,11 @@
                                     <a href="./sell-edit.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
 
                                    <?php if($id_power != 3){ ?>
-                                        <a href="./sell-manage.php?brand=<?php echo $id_brand?>&del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
+                                        <a href="./sell-manage.php?brand=<?php echo $_GET['brand']?>&del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i></a>
                                     <?php } ?>
+                                    <button class="post-button" data-id="<?php echo $value -> id ?>" style = "margin: 0 5px; border: none;"  >
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
                                 </td>
                             </tr>
                         <?php } ?>
@@ -206,6 +239,14 @@
         </div>
         <!-- /main-right -->
     </div>
+    <div id="result">
+        
+    </div>
+    
+
+    <script>
+        
+    </script>
     <!-- footer + js -->
     <?php include('include/footer.php');?>
     <!-- /footer + js -->
@@ -224,7 +265,7 @@
                      <?php echo $message ?>
                 </p>
             </div>
-            <a href="./sell-manage.php?brand=<?php echo $id_brand ?>" class="btn">OK</a>
+            <a href="./sell-manage.php?brand=<?php echo $_GET['brand'] ?>" class="btn">OK</a>
         </div>
     </div>
     <?php }?>
@@ -254,7 +295,15 @@
                 filename: "quanlybanhang.xls", 
                 preserveColors: false
             });
-        }
+        }        
+        $(document).ready(function () {
+        document.getElementById("result").addEventListener("click", function (event) {
+            if (!event.target.closest("table")) {
+            this.classList.remove("active");
+            }
+        });
+        });
     </script>
+
 </body>
 </html>

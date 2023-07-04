@@ -81,9 +81,6 @@
                                 <td style = "text-align: center;">
                                     <a href="./edit-user.php?id=<?php echo $value -> id ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
 
-                                    <a href="./categories.php?del=<?php echo $value -> id ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
-                                    </a>
-
                                     <?php if( $value -> status == 1){ ?>
                                         <i class="fa-solid fa-circle col-green" ></i>
                                     <?php }else{ ?>

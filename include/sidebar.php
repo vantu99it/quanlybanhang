@@ -9,7 +9,7 @@
 ?>
 <div id="sidebar" class = "sidebar">
     <div class="sidebar-title">
-        <h1>menu quản trị</h1>
+        <h1>Menu quản trị</h1>
     </div>
     <ul class="sidebar-menu">
         <li class="menu-item">
@@ -19,7 +19,7 @@
             </a>
         </li>
         <li class="menu-item">
-            <a href="javascrip:void(0)">
+            <a href="#">
             <iconify-icon class="icon" icon="ic:twotone-post-add" width="24" height="24"></iconify-icon>
                 Quản lý bán hàng
                 <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
@@ -40,7 +40,7 @@
             </ul>
         </li>
         <li class="menu-item">
-            <a href="javascrip:void(0)">
+            <a href="#">
                 <iconify-icon class="icon" icon="material-symbols:input-rounded" width="24" height="24"></iconify-icon>
                 Quản lý nhập kho
                 <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
@@ -50,12 +50,12 @@
                 <?php if($id_power != 3){ ?>
                     <li class="menu-item-mini"><a href="./import-manage.php">Hàng đã nhập</a></li>
                 <?php } else { ?>
-                    <li class="menu-item-mini"><a href="./import-manage.php?brand=2">Hàng đã nhập</a></li>
+                    <li class="menu-item-mini"><a href="./import-manage.php?brand=<?php echo $id_brand ?>">Hàng đã nhập</a></li>
                 <?php } ?>
             </ul>
         </li>
         <li class="menu-item">
-            <a href="javascrip:void(0)">
+            <a href="#">
                 <iconify-icon class="icon" icon="material-symbols:output-rounded" width="24" height="24"></iconify-icon>
                 Quản lý xuất kho
                 <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
@@ -65,12 +65,12 @@
                 <?php if($id_power != 3){ ?>
                     <li class="menu-item-mini"><a href="./output-manage.php">Hàng đã xuất</a></li>
                 <?php } else { ?>
-                    <li class="menu-item-mini"><a href="./output-manage.php?brand=2">Hàng đã xuất</a></li>
+                    <li class="menu-item-mini"><a href="./output-manage.php?brand=<?php echo $id_brand ?>">Hàng đã xuất</a></li>
                 <?php } ?>
             </ul>
         </li>
         <li class="menu-item">
-            <a href="javascrip:void(0)">
+            <a href="#">
                 <iconify-icon class="icon" icon="ic:outline-cancel-presentation" width="24" height="24"></iconify-icon>
                 Quản lý hủy kệ
                 <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
@@ -80,13 +80,13 @@
                 <?php if($id_power != 3){ ?>
                     <li class="menu-item-mini"><a href="./cancel-manage.php">Hàng đã hủy</a></li>
                 <?php } else { ?>
-                    <li class="menu-item-mini"><a href="./cancel-manage.php?brand=2">Hàng đã hủy</a></li>
+                    <li class="menu-item-mini"><a href="./cancel-manage.php?brand=<?php echo $id_brand ?>">Hàng đã hủy</a></li>
                 <?php } ?>
             </ul>
         </li>
-        <?php if($id_power != 3){ ?>
+
             <li class="menu-item">
-                <a href="javascrip:void(0)">
+                <a href="#">
                    <iconify-icon class="icon" icon="carbon:summary-kpi" width="24" height="24"></iconify-icon>
                     Quản lý báo cáo
                     <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
@@ -94,14 +94,16 @@
                 <ul class="sidebar-menu-mini">
                     <li class="menu-item-mini"><a href="./manage-total-warehouse.php">Kho hàng tổng</a></li>
                     <li class="menu-item-mini"><a href="./manage-total-warehouse-none.php">Hết hàng</a></li>
-                    <li class="menu-item-mini"><a href="./manage-top-sales.php?brand=1">Top doanh số</a></li>
-                    <li class="menu-item-mini"><a href="./manage-top-quantity.php?brand=1">Top số lượng</a></li>
-                    <li class="menu-item-mini"><a href="./collaborators.php?brand=1">Cộng tác viên</a></li>
+                    <?php if($id_power != 3){ ?>
+                        <li class="menu-item-mini"><a href="./manage-top-sales.php?brand=1">Top doanh số</a></li>
+                        <li class="menu-item-mini"><a href="./manage-top-quantity.php?brand=1">Top số lượng</a></li>
+                        <li class="menu-item-mini"><a href="./collaborators.php?brand=1">Cộng tác viên</a></li>
+                    <?php } ?>
                 </ul>
             </li>
-        <?php } ?>
+
         <li class="menu-item">
-            <a href="javascrip:void(0)">
+            <a href="#">
                 <iconify-icon class="icon" icon="fluent-mdl2:product-variant" width="24" height="24"></iconify-icon>
                 Quản lý sản phẩm
                 <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
@@ -114,7 +116,7 @@
             </ul>
         </li>
         <li class="menu-item">
-            <a href="javascrip:void(0)">
+            <a href="#">
                <iconify-icon class="icon" icon="material-symbols:playlist-add-check-circle-rounded" width="24" height="24"></iconify-icon>
                 Chấm công
                 <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
@@ -128,7 +130,7 @@
         </li>
         
         <li class="menu-item">
-            <a href="javascrip:void(0)">
+            <a href="#">
                 <iconify-icon class="icon" icon="mdi:user-card-details-outline" width="24" height="24"></iconify-icon>
                 Quản lý tài khoản
                 <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
@@ -143,7 +145,7 @@
         </li>
         <?php if($id_power != 3){ ?>
             <li class="menu-item">
-                <a href="javascrip:void(0)">
+                <a href="#">
                    <iconify-icon class="icon" icon="foundation:burst-sale" width="24" height="24"></iconify-icon>
                     Quản lý giảm giá
                     <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
@@ -156,7 +158,7 @@
         <?php } ?>
         <?php if($id_power != 3){ ?>
             <li class="menu-item">
-                <a href="javascrip:void(0)">
+                <a href="#">
                     <iconify-icon class="icon" icon="ep:setting" width="24" height="24"></iconify-icon>
                     Thiết lập
                     <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>

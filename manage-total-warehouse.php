@@ -75,7 +75,7 @@
                     <h1>Quản lý tổng kho <?php echo isset($_GET['brand'])?"cơ sở ".$_GET['brand']:""?></h1>
                 </div>
             </section>
-            <?php if($id_power != 3){ ?>
+            
                 <section class="main-right-filter">
                     <div class="account-btn">
                         <a href="./manage-total-warehouse.php" class="btn btn-post btn-add <?php if(!isset($_GET['brand'])){echo "btn-active";}?>" >Tất cả</a>
@@ -86,11 +86,13 @@
                     <div class="account-btn">
                         <a href="./manage-total-warehouse.php?brand=2" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 2){echo "btn-active";}?>">Cơ sở 2</a>
                     </div>
-                    <div class="account-btn full-screen">
-                        <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
-                    </div>
+                    <?php if($id_power != 3){ ?>
+                        <div class="account-btn full-screen">
+                            <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
+                        </div>
+                    <?php } ?>
+
                 </section>
-            <?php } ?>
             <div class="main-right-table">
                 <table class="table table-bordered table-post-list" id = "table-manage">
                     <thead>

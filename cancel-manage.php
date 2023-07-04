@@ -67,7 +67,7 @@
         <div id="main-right">
             <section class="main-right-title" style = "margin-bottom: 5px;">
                 <div class="form-title">
-                    <h1>Quản lý hủy kệ</h1>
+                    <h1>Quản lý hủy kệ CS<?php echo $id_brand?></h1>
                 </div>
                 <div class="account-btn">
                     <a href="./cancel-warehouse.php" class="btn btn-post btn-add">Hủy kệ</a>
@@ -102,7 +102,9 @@
                             <th>Người hủy</th>
                             <th>Ngày hủy</th>
                             <th class = "full-screen">Ghi chú</th>
-                            <th>Hành động</th>
+                            <?php if($id_power != 3){ ?>
+                                <th>Hành động</th>
+                            <?php }?>
                         </tr>
                         
                     </thead>
@@ -172,13 +174,13 @@
                                 <td class = "full-screen">
                                     <p><?php echo $value -> note ?></p>
                                 </td>
-                                <td style = "text-align: center;">
-                                    <a href="./edit-cancel-warehouse.php?id=<?php echo $value -> id ?>&brand=<?php echo $value -> id_brand ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
-
-                                    <?php if($id_power != 3){ ?>
+                                <?php if($id_power != 3){ ?>
+                                    <td style = "text-align: center;">
+                                        <a href="./edit-cancel-warehouse.php?id=<?php echo $value -> id ?>&brand=<?php echo $value -> id_brand ?>" class="btn-setting btn-edit colo-blue" style = "margin: 0 5px;"><i class="fa-regular fa-pen-to-square"></i></a>
                                         <a href="./cancel-manage.php?del=<?php echo $value -> id ?>&brand=<?php echo $value -> id_brand ?>" class="btn-setting col-red" style = "margin: 0 5px;" onclick="return confirm('Bạn chắc chắn muốn xóa?');" ><i class="fa-solid fa-trash"></i>
-                                    <?php } ?>
-                                </td>
+                                    </td>
+                                <?php } ?>
+
                             </tr>
                         <?php } ?>
                     </tbody>

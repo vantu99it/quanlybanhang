@@ -25,14 +25,10 @@
             $fromDate = $year."-".$monthFrom."-14";
             $toDate = $year."-".$monthTo."-13";
         }else{
-             $fromDate = $year."-".$monthFrom."-22";
+            $fromDate = $year."-".$monthFrom."-22";
             $toDate = $year."-".$monthTo."-21";
         }
         
-
-        // var_dump($fromDate);
-        // var_dump($toDate); die();
-
 
         $err = "";
         $ok = "";
@@ -45,14 +41,14 @@
             $id_brand =$_GET['brand'];
             // var_dump($fromDate);
 
-            $querySales= $conn -> prepare("SELECT pro.name AS product, pro.detail,pro.id, sum(sell.total) AS total from tbl_sell_manage sell JOIN tbl_product pro ON pro.id = sell.id_product WHERE sell.date <= :toDate AND sell.date >= :fromDate AND sell.id_brand = :id_brand GROUP BY  pro.id ORDER BY sum(sell.total) DESC " );
+            $querySales= $conn -> prepare("SELECT sell.id_brand, pro.name AS product, pro.detail,pro.id, sum(sell.total) AS total from tbl_sell_manage sell JOIN tbl_product pro ON pro.id = sell.id_product WHERE sell.date <= :toDate AND sell.date >= :fromDate AND sell.id_brand = :id_brand GROUP BY  pro.id ORDER BY sum(sell.total) DESC " );
             $querySales->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $querySales->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
             $querySales->bindParam(':toDate',$toDate,PDO::PARAM_STR);
             $querySales-> execute();
             $resultsSales = $querySales->fetchAll(PDO::FETCH_OBJ);
         }else{
-            $querySales= $conn -> prepare("SELECT pro.name AS product, pro.detail,pro.id, sum(sell.total) AS total from tbl_sell_manage sell JOIN tbl_product pro ON pro.id = sell.id_product WHERE sell.date <= :toDate AND sell.date >= :fromDate AND sell.id_brand = :id_brand GROUP BY  pro.id ORDER BY sum(sell.total) DESC " );
+            $querySales= $conn -> prepare("SELECT sell.id_brand, pro.name AS product, pro.detail,pro.id, sum(sell.total) AS total from tbl_sell_manage sell JOIN tbl_product pro ON pro.id = sell.id_product WHERE sell.date <= :toDate AND sell.date >= :fromDate AND sell.id_brand = :id_brand GROUP BY  pro.id ORDER BY sum(sell.total) DESC ");
             $querySales->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $querySales->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
             $querySales->bindParam(':toDate',$toDate,PDO::PARAM_STR);
@@ -107,6 +103,7 @@
                     <h1>Top doanh số cơ sở <?php echo $_GET['brand'] ?></h1>
                 </div>
             </section>
+
             <section class="main-right-filter">
                 <div class="account-btn">
                     <a href="./manage-top-sales.php?brand=1" class="btn btn-post btn-add <?php if(isset($_GET['brand']) && $_GET['brand'] == 1){echo "btn-active";}?>">Cơ sở 1</a>
@@ -127,6 +124,7 @@
                     </div>
                 <?php } ?>
             </section>
+                        <?php         var_dump($_GET['brand']);?>
             <div class="main-right-table">
                 <table class="table table-bordered table-post-list" id = "table-manage">
                     <thead>
@@ -153,8 +151,11 @@
                                 <td>
                                     <p >
                                         <?php 
-                                            $queryQuantity= $conn -> prepare("SELECT sum(quantity) as quantity FROM tbl_sell_manage WHERE id_product = :id_product" );
+                                            $queryQuantity= $conn -> prepare("SELECT sum(quantity) as quantity FROM tbl_sell_manage sell WHERE sell.id_product = :id_product AND sell.id_brand = :id_brand AND sell.date <= :toDate AND sell.date >= :fromDate" );
                                             $queryQuantity->bindParam(':id_product',$value -> id,PDO::PARAM_STR);
+                                            $queryQuantity->bindParam(':id_brand',$_GET['brand'],PDO::PARAM_STR);
+                                            $queryQuantity->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
+                                            $queryQuantity->bindParam(':toDate',$toDate,PDO::PARAM_STR);
                                             $queryQuantity-> execute();
                                             $resultsQuantity = $queryQuantity->fetch(PDO::FETCH_OBJ);
                                             echo $resultsQuantity -> quantity;

@@ -156,9 +156,11 @@
                                 <td>
                                     <p>
                                         <?php 
-                                            $queryTotal= $conn -> prepare("SELECT sum(total) as total FROM tbl_sell_manage WHERE id_product = :id_product AND id_brand = :id_brand" );
+                                            $queryTotal= $conn -> prepare("SELECT sum(total) as total FROM tbl_sell_manage sell WHERE id_product = :id_product AND id_brand = :id_brand AND sell.date <= :toDate AND sell.date >= :fromDate" );
                                             $queryTotal->bindParam(':id_product',$value -> id,PDO::PARAM_STR);
-                                            $queryTotal->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
+                                            $queryTotal->bindParam(':id_brand',$_GET['brand'],PDO::PARAM_STR);
+                                            $queryTotal->bindParam(':fromDate',$fromDate,PDO::PARAM_STR);
+                                            $queryTotal->bindParam(':toDate',$toDate,PDO::PARAM_STR);
                                             $queryTotal-> execute();
                                             $resultsTotal = $queryTotal->fetch(PDO::FETCH_OBJ);
                                             $tien = (int) $resultsTotal -> total;
