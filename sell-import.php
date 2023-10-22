@@ -28,9 +28,6 @@
         $queryBrand-> execute();
         $resultsBrand = $queryBrand->fetchAll(PDO::FETCH_OBJ);
 
-
-
-
         //thanh toán
         $queryPay= $conn -> prepare("SELECT * FROM tbl_payment_status WHERE status = 1");
         $queryPay-> execute();
@@ -50,6 +47,12 @@
             $sale = $_POST["sale"];
             $plus = $_POST["plus"];
             $id_payment_status  = $_POST["payment"];
+            if($id_payment_status == 3  || $id_payment_status == 4){
+                $cod  = $_POST["cod"];
+                $phone  = $_POST["phone-cod"];
+                $information_line  = $_POST["information_line"];
+                $status  = $_POST["cod-status"];
+            }
             $id_from_where = $_POST["from"];
             $note = $_POST["note"];
             // var_dump($id_user_sell); die();
@@ -68,8 +71,6 @@
                 $total = $price * $quantity - $sale + $plus;
             }
             
-
-
             $queryWare= $conn -> prepare("INSERT INTO tbl_sell_manage (id_brand, id_user_sell, date, id_product, quantity, sale, plus, total, id_payment_status , id_from_where, id_user, note ) value (:id_brand, :id_user_sell, :date, :id_product, :quantity, :sale, :plus, :total, :id_payment_status , :id_from_where, :id_user, :note)");
             $queryWare->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $queryWare->bindParam(':id_user_sell',$id_user_sell,PDO::PARAM_STR);
@@ -86,7 +87,20 @@
             $queryWare-> execute();
             $lastInsertId = $conn->lastInsertId();
             if($lastInsertId){
-                $msg = "Đơn đã được lưu!";
+                if($id_payment_status == 3 || $id_payment_status == 4){
+                    $queryCOD= $conn -> prepare("INSERT INTO tbl_cod (id_sell_manager, cod, phone, information_line, status, updated_ad) value (:id_sell_manager, :cod, :phone, :information_line, :status, :updated_ad)");
+                    $queryCOD->bindParam(':id_sell_manager',$lastInsertId,PDO::PARAM_STR);
+                    $queryCOD->bindParam(':cod',$cod,PDO::PARAM_STR);
+                    $queryCOD->bindParam(':phone',$phone,PDO::PARAM_STR);
+                    $queryCOD->bindParam(':information_line',$information_line,PDO::PARAM_STR);
+                    $queryCOD->bindParam(':status',$status,PDO::PARAM_STR);
+                    $queryCOD->bindParam(':updated_ad',$now_day,PDO::PARAM_STR);
+                    $queryCOD-> execute();
+                    $msg = "Đơn COD được lưu!";
+                }else{
+                     $msg = "Đơn đã được lưu!";
+
+                }
             }else{
                 $error = "Thất bại! Vui lòng thử lại!";
             }
@@ -205,7 +219,7 @@
 
                     <div class="search-item form-validator">
                         <p class="item-name">Chọn hình thức thanh toán <span class="col-red">*</span></p>
-                        <select  class="autobox form-focus boder-ra-5" name ="payment" id="payment" onchange="totalPayment()">
+                        <select  class="autobox form-focus boder-ra-5" name ="payment" id="payment" onchange="totalPayment(); getCOD();">
                             <option value="">Chọn loại thanh toán</option>
                             <?php foreach ($resultsPay as $key => $value) { ?>
                                 <option value="<?php echo $value -> id ?>"><?php echo $value -> name ?></option>
@@ -217,6 +231,10 @@
                     <div class="form-input form-validator" id = "total_payment">
                         <!-- code js đẩy vào -->
                         <p class="form-message"></p>
+                    </div>
+
+                    <div id="add_cod">
+                       
                     </div>
 
                     <div class="search-item form-validator">
@@ -249,22 +267,7 @@
     <!-- /footer + js -->
     
     <!-- Bắt lỗi nhập vào -->
-    <script>
-        Validator({
-            form: '#frm-post',
-            formGroupSelector: '.form-validator',
-            errorSelector: ".form-message",
-            rules: [
-                Validator.isRequired('#brand', 'Vui lòng chọn cơ sở'), 
-                Validator.isRequired('#product', 'Vui lòng chọn sản phẩm'),
-                Validator.isRequired('#user', 'Vui lòng chọn người bán'),
-                Validator.isRequired('#date', 'Vui lòng chọn ngày bán'),
-                Validator.isRequired('#quantity', 'Vui lòng nhập số lượng'),
-                Validator.isRequired('#payment', 'Vui lòng chọn hình thức TT'),
-                Validator.isRequired('#from', 'Vui lòng chọn đơn từ đâu'),
-            ],
-        });
-    </script>
+   
 
     <!-- kiểm tra số lượng xuất ra-->
     <script>
@@ -301,6 +304,72 @@
         };
     </script>
 
+    <script>
+        function getCOD(){
+            var payment = $("#payment").val();
+            jQuery.ajax({
+            url: "./include/get-cod.php?payment=" + payment,
+            success: function(data) {
+                $("#add_cod").html(data);
+            },
+            error: function() {}
+            });
+            if (payment == 4 || payment == 3) {
+                Validator({
+                    form: '#frm-post',
+                    formGroupSelector: '.form-validator',
+                    errorSelector: ".form-message",
+                    rules: [
+                        Validator.isRequired('#brand', 'Vui lòng chọn cơ sở'), 
+                        Validator.isRequired('#product', 'Vui lòng chọn sản phẩm'),
+                        Validator.isRequired('#user', 'Vui lòng chọn người bán'),
+                        Validator.isRequired('#date', 'Vui lòng chọn ngày bán'),
+                        Validator.isRequired('#quantity', 'Vui lòng nhập số lượng'),
+                        Validator.isRequired('#payment', 'Vui lòng chọn hình thức TT'),
+                        Validator.isRequired('#from', 'Vui lòng chọn đơn từ đâu'),
+                        Validator.isRequired('#cod-status', 'Vui lòng chọn trạng thái'), 
+                        Validator.isRequired('#cod', 'Vui lòng nhập mã vận đơn'),
+                        Validator.isRequired('#phone-cod'),
+                        Validator.isPhone('#phone-cod', 'Số điện thoại gồm 10 số và bắt đầu từ số 0'),
+                        Validator.isRequired('#information_line', 'Vui lòng chọn nhập TT đơn'),
+                    ],
+                });
+            }
+        };
+    </script>
+     <script>
+        Validator({
+            form: '#frm-post',
+            formGroupSelector: '.form-validator',
+            errorSelector: ".form-message",
+            rules: [
+                Validator.isRequired('#brand', 'Vui lòng chọn cơ sở'), 
+                Validator.isRequired('#product', 'Vui lòng chọn sản phẩm'),
+                Validator.isRequired('#user', 'Vui lòng chọn người bán'),
+                Validator.isRequired('#date', 'Vui lòng chọn ngày bán'),
+                Validator.isRequired('#quantity', 'Vui lòng nhập số lượng'),
+                Validator.isRequired('#payment', 'Vui lòng chọn hình thức TT'),
+                Validator.isRequired('#from', 'Vui lòng chọn đơn từ đâu'),
+            ],
+        });
+    </script>
+    
+    <!-- Hiện chi tiết bài viết -->
+    <script>
+        function selectProd(){
+            jQuery.ajax({
+                url: "./include/get-product-ware.php",
+                data: 'prod=' + $("#product").val(),
+                type: "POST",
+                success: function(data) {
+                    var city = data;
+                    console.log(city);
+                    $("#nameProduct").html(data);
+                },
+                error: function() {}
+            });
+        };
+    </script>
     <!-- select tìm kiếm -->
     <script>
         $(document).ready(function() { 
@@ -318,22 +387,6 @@
             }); 
             
         });
-    </script>
-    <!-- Hiện chi tiết bài viết -->
-    <script>
-        function selectProd(){
-            jQuery.ajax({
-                url: "./include/get-product-ware.php",
-                data: 'prod=' + $("#product").val(),
-                type: "POST",
-                success: function(data) {
-                    var city = data;
-                    console.log(city);
-                    $("#nameProduct").html(data);
-                },
-                error: function() {}
-            });
-        };
     </script>
 </body>
 </html>

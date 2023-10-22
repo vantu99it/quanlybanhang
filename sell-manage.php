@@ -62,18 +62,28 @@
         $id_brand =$_GET['brand'];
         if(isset($_REQUEST['del'])&&($_REQUEST['del'])){
             $delId = intval($_GET['del']);
-            
-            $query= $conn -> prepare("DELETE FROM tbl_sell_manage WHERE id = :id");
-            $query->bindParam(':id',$delId,PDO::PARAM_STR);
-            $query->execute();
-            if($query){
-                $ok = 1;
-                $message = "Đã xóa thành công";
+
+            $queryDelCod= $conn -> prepare("DELETE FROM tbl_cod WHERE id_sell_manager  = :id");
+            $queryDelCod->bindParam(':id',$delId,PDO::PARAM_STR);
+            $queryDelCod->execute();
+
+            if($queryDelCod){
+                $query= $conn -> prepare("DELETE FROM tbl_sell_manage WHERE id = :id");
+                $query->bindParam(':id',$delId,PDO::PARAM_STR);
+                $query->execute();
+                if($query){
+                    $ok = 1;
+                    $message = "Đã xóa thành công";
+                }
+                else{
+                    $err = 1;
+                    $message = "Có lỗi xảy ra, vui lòng thử lại";
+                }
             }
             else{
-                $err = 1;
-                $message = "Có lỗi xảy ra, vui lòng thử lại";
-            }
+                    $err = 1;
+                    $message = "Có lỗi xảy ra, vui lòng thử lại";
+                }
         }
     }
 ?>
@@ -296,12 +306,15 @@
                 preserveColors: false
             });
         }        
+        
+    </script>
+    <script>
         $(document).ready(function () {
-        document.getElementById("result").addEventListener("click", function (event) {
-            if (!event.target.closest("table")) {
-            this.classList.remove("active");
-            }
-        });
+            document.getElementById("result").addEventListener("click", function (event) {
+                if (!event.target.closest("table")) {
+                this.classList.remove("active");
+                }
+            });
         });
     </script>
 

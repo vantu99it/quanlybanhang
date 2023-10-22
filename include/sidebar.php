@@ -34,9 +34,10 @@
                     foreach ($resultsBrandIds as $key => $value) {
                 ?>
                     <li class="menu-item-mini"><a href="./sell-manage.php?brand=<?php echo $value -> id ?>"><?php echo $value -> name ?></a></li>
+                    
                 <?php } ?>
-                    <li class="menu-item-mini"><a href="./sell-COD.php">Đơn COD</a></li>
                 <?php }?>
+                <li class="menu-item-mini"><a href="./sell-COD.php">Đơn COD</a></li>
             </ul>
         </li>
         <li class="menu-item">
@@ -122,7 +123,11 @@
                 <iconify-icon class="down" icon="bx:chevron-down" width="18" height="18"></iconify-icon>
             </a>
             <ul class="sidebar-menu-mini">
-                <li class="menu-item-mini"><a href="./timekeeping.php">Chấm công</a></li>
+                 <?php if($id_power != 3){ ?>
+                    <li class="menu-item-mini"><a href="./timekeeping-admin.php">Chấm công</a></li>
+                <?php } else{?>
+                    <li class="menu-item-mini"><a href="./timekeeping.php">Chấm công</a></li>
+                <?php } ?>
                 <?php foreach ($resultsBrandIds as $key => $value) { ?>
                 <li class="menu-item-mini"><a href="./timekeeping-brand.php?brand=<?php echo $value -> id ?>">Bảng chấm công CS<?php echo $value -> id ?></a></li>
                 <?php } ?>

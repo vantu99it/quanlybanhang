@@ -4,23 +4,66 @@
     if (!isset($_SESSION['logins'])) {
         header('location:index.php');
     }else{
+        $hs = " 00:00:00";
+        $he = " 23:59:59";
         $err = "";
         $ok = "";
         $message = "";
-        
+        $today = date('Y-m-d 00:00:00');
+        $previous_date = date('Y-m-d 00:00:00', strtotime('-60 days', strtotime($today)));
+
+        $today_fill = date('Y-m-d');
+        $previous_date_fill = date('Y-m-d', strtotime('-60 days', strtotime($today)));
+
         $id_user = $_SESSION['logins']['id'];
         $id_power = $_SESSION['logins']['power'];
         $id_brand = $_SESSION['logins']['id_brand'];
         if(isset($_GET['brand'])){
-            $id_brand = $_GET['brand'];
-            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand WHERE wa.id_act = 3 AND wa.id_brand = :id_brand ORDER BY wa.created_ad DESC");
-            $queryWare->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
-            $queryWare-> execute();
-            $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
+            if($_SERVER["REQUEST_METHOD"] == "POST"){
+                $fromDate = $_POST["from-date"].$hs;
+                $toDate = $_POST["to-date"].$he;
+
+                $fromDate_fill = $_POST["from-date"];
+                $toDate_fill = $_POST["to-date"];
+
+                $id_brand = $_GET['brand'];
+                $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand WHERE wa.id_act = 3 AND wa.id_brand = :id_brand AND wa.created_ad <= :toDate AND wa.created_ad >= :fromDate ORDER BY wa.created_ad DESC");
+                $queryWare->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
+                $queryWare->bindParam('toDate',$toDate,PDO::PARAM_STR);
+                $queryWare->bindParam('fromDate',$fromDate,PDO::PARAM_STR);
+                $queryWare-> execute();
+                $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
+            }
+            else{
+                $id_brand = $_GET['brand'];
+                $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand WHERE wa.id_act = 3 AND wa.id_brand = :id_brand AND wa.created_ad <= :today AND wa.created_ad >= :previous_date ORDER BY wa.created_ad DESC");
+                $queryWare->bindParam('id_brand',$id_brand,PDO::PARAM_STR);
+                $queryWare->bindParam('today',$today,PDO::PARAM_STR);
+                $queryWare->bindParam('previous_date',$previous_date,PDO::PARAM_STR);
+                $queryWare-> execute();
+                $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
+            }
         }else{
-            $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand WHERE wa.id_act = 3 ORDER BY wa.created_ad DESC");
-            $queryWare-> execute();
-            $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
+            if($_SERVER["REQUEST_METHOD"] == "POST"){
+                $fromDate = $_POST["from-date"].$hs;
+                $toDate = $_POST["to-date"].$he;
+
+                $fromDate_fill = $_POST["from-date"];
+                $toDate_fill = $_POST["to-date"];
+
+                $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand WHERE wa.id_act = 3 AND wa.created_ad <= :toDate AND wa.created_ad >= :fromDate ORDER BY wa.created_ad DESC");
+                $queryWare->bindParam('toDate',$toDate,PDO::PARAM_STR);
+                $queryWare->bindParam('fromDate',$fromDate,PDO::PARAM_STR);
+                $queryWare-> execute();
+                $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
+            }
+            else{
+                $queryWare= $conn -> prepare("SELECT wa.*, us.username AS user, pro.name AS product, br.name AS brand FROM tbl_warehouse wa JOIN tbl_product pro ON pro.id = wa.id_product JOIN tbl_user us ON us.id = wa.id_user JOIN tbl_brand br ON br.id = wa.id_brand WHERE wa.id_act = 3 AND wa.created_ad <= :today AND wa.created_ad >= :previous_date ORDER BY wa.created_ad DESC");
+                $queryWare->bindParam('today',$today,PDO::PARAM_STR);
+                $queryWare->bindParam('previous_date',$previous_date,PDO::PARAM_STR);
+                $queryWare-> execute();
+                $resultsWare = $queryWare->fetchAll(PDO::FETCH_OBJ);
+            }
         }
 
         // Xóa 
@@ -87,8 +130,26 @@
                     <div class="account-btn full-screen">
                         <button class="btn btn-post btn-add" onclick = "tableToExcel()">Xuất excel</button>
                     </div>
+                    <div class="account-btn">
+                        <button class="btn btn-post btn-add filter-btn" id = "filter-btn">Lọc</button>
+                    </div>
                 </section>
-            <?php } ?>
+            <?php } else{?>
+                <section class="main-right-filter">
+                    <div class="account-btn">
+                        <button class="btn btn-post btn-add filter-btn" id = "filter-btn">Lọc</button>
+                    </div>
+                </section>
+            <?php }?>
+            <section class="main-right-filter filter-none">
+                <form action="" method="post">
+                    <span>Từ</span>
+                    <input type="date" name="from-date" id="from-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($fromDate_fill)? $fromDate_fill : $previous_date_fill ?>">
+                    <span>Đến</span>
+                    <input type="date" name="to-date" id="to-date" class=" form-focus boder-ra-5" style =" height: 30px; padding: 0 8px; margin: 0 5px; max-width: 120px" value = "<?php echo isset($toDate_fill)? $toDate_fill :$today_fill ?>">
+                    <input type="submit" value="Lọc" class="btn btn-post btn-add">
+                </form>
+            </section>
             <div class="main-right-table">
                 <table class="table table-bordered table-post-list" id = "table-manage">
                     <thead>

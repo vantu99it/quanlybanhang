@@ -552,6 +552,18 @@ body {
   flex-wrap: nowrap;
   justify-content: center;
 }
+.filter-btn.open {
+  background-color: red;
+}
+.filter-none {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.filter-none.open {
+  display: flex;
+  opacity: 1;
+}
 #main-right .table-bordered th,
 .table-bordered td {
   text-align: center;
@@ -726,4 +738,46 @@ body {
 #result.active table {
   text-align: center;
   color: #000;
+}
+.question {
+  position: relative;
+  cursor: pointer;
+}
+
+.question-info {
+  padding: 10px;
+  border: 1px solid #ccc;
+  display: none;
+  position: absolute;
+  z-index: 100;
+  background: #fff;
+  left: -175px;
+}
+.question > i {
+  margin-left: 15px;
+  font-size: 20px;
+}
+.question table {
+  border-collapse: collapse !important;
+  width: 200px;
+}
+.question tr,
+.question th,
+.question td {
+  border: 1px solid #ccc !important;
+  border-width: 1px !important;
+  text-align: center;
+  padding: 5px;
+}
+.question .question-info td i {
+  border: 1px solid #000;
+  border-radius: 50%;
+}
+.question-info p {
+  margin-bottom: 10px;
+  text-align: center;
+}
+.post-button-cod,
+.post-button {
+  background: none !important;
 }

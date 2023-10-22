@@ -33,7 +33,7 @@ $(document).ready(function () {
       url: "https://cdn.datatables.net/plug-ins/1.12.1/i18n/vi.json",
     },
     pageLength: 15,
-    lengthMenu: [1, 2, 3, 4, 5, 10, 15, 20, 30, 50, 100],
+    lengthMenu: [1, 5, 15, 30, 50, 100, 200, 400, 500, 800, 1000],
     // order: [[0, "desc"]],
   });
 });
@@ -99,4 +99,58 @@ $(document).ready(function () {
       },
     });
   });
+});
+$(document).ready(function () {
+  $(".post-button-cod").click(function () {
+    var id_cod = $(this).data("id");
+    $.ajax({
+      url: "./include/get-code-detail.php?id_cod=" + id_cod,
+      success: function (response) {
+        $("#result").html(response);
+        $("#result").addClass("active");
+      },
+      error: function (xhr) {
+        console.log(xhr.responseText);
+      },
+    });
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  var filterButton = document.querySelector(".filter-btn");
+  var filterSection = document.querySelector(".filter-none");
+
+  filterButton.addEventListener("click", function () {
+    filterSection.classList.toggle("open");
+    filterButton.classList.toggle("open");
+  });
+});
+
+$(document).ready(function () {
+  $(".question").click(function (event) {
+    var questionInfo = $(this).find(".question-info");
+    if (questionInfo.is(":visible")) {
+      questionInfo.hide();
+    } else {
+      questionInfo.show();
+    }
+    event.stopPropagation();
+  });
+
+  $(document).click(function (event) {
+    if (!$(event.target).closest(".question").length) {
+      $(".question-info").hide();
+    }
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  var resultElement = document.getElementById("result");
+  if (resultElement) {
+    resultElement.addEventListener("click", function (event) {
+      if (!event.target.closest("table")) {
+        this.classList.remove("active");
+      }
+    });
+  }
 });

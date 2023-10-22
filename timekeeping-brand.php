@@ -115,7 +115,11 @@
                     <h1>Bảng chấm công CS<?php echo $_GET['brand'];?></h1>
                 </div>
                 <div class="account-btn">
-                    <a href="./timekeeping.php" class="btn btn-post btn-add">Chấm công</a>
+                    <?php if($id_power != 3){ ?>
+                    <a href="./timekeeping-admin.php" class="btn btn-post btn-add">Chấm công</a>
+                    <?php } else{ ?>
+                        <a href="./timekeeping.php" class="btn btn-post btn-add">Chấm công</a>
+                    <?php } ?>
                 </div>
             </section>
             <section class="main-right-filter">

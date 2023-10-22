@@ -86,7 +86,7 @@
                 $total = $price * $quantity - $sale + $plus;
             }
 
-            $queryWare= $conn -> prepare("UPDATE tbl_sell_manage SET id_brand = :id_brand, id_user_sell = :id_user_sell, date = :date, id_product = :id_product, quantity = :quantity, sale = :sale, plus = :plus, total = :total, id_payment_status = :id_payment_status , id_from_where = :id_from_where, id_user = :id_user, note = :note, update_ad = NOW() WHERE id = :id ");
+            $queryWare= $conn -> prepare("UPDATE tbl_sell_manage SET id_brand = :id_brand, id_user_sell = :id_user_sell, date = :date, id_product = :id_product, quantity = :quantity, sale = :sale, plus = :plus, total = :total, id_payment_status = :id_payment_status , id_from_where = :id_from_where, id_user = :id_user, note = :note, update_ad = :now_day WHERE id = :id ");
             $queryWare->bindParam(':id_brand',$id_brand,PDO::PARAM_STR);
             $queryWare->bindParam(':id_user_sell',$id_user_sell,PDO::PARAM_STR);
             $queryWare->bindParam(':date',$date,PDO::PARAM_STR);
@@ -99,6 +99,7 @@
             $queryWare->bindParam(':id_from_where',$id_from_where,PDO::PARAM_STR);
             $queryWare->bindParam(':id_user',$id_user,PDO::PARAM_STR);
             $queryWare->bindParam(':note',$note,PDO::PARAM_STR);
+            $queryWare->bindParam(':now_day',$now_day,PDO::PARAM_STR);
             $queryWare->bindParam(':id',$id_sell,PDO::PARAM_STR);
             $queryWare-> execute();
             if($queryWare){
@@ -115,7 +116,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Bảng điều khiển</title>
+    <title>Admin | Chỉnh sửa đơn hàng</title>
     <!-- link-css -->
     <?php include('include/link-css.php');?>
     <!-- /link-css -->
